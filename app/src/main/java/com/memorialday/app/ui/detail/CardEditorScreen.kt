@@ -469,34 +469,44 @@ private fun DateSection(
                     )
                 }
             } else {
-                // ---------- 农历：文本输入 ----------
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("农历年", fontSize = 13.sp, color = AppColors.textSecondaryLight)
-                    Spacer(modifier = Modifier.weight(1f))
-                    OutlinedTextField(
-                        value = lunarYear.toString(),
-                        onValueChange = { it.toIntOrNull()?.let { y -> onLunarYearChange(y) } },
-                        modifier = Modifier.width(100.dp)
+                // ---------- 农历：年月日滚轮 ----------
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    // 农历年
+                    AndroidView(
+                        modifier = Modifier.weight(1f).height(160.dp),
+                        factory = { ctx ->
+                            android.widget.NumberPicker(ctx).apply {
+                                minValue = 1901; maxValue = 2100; value = lunarYear
+                                setOnValueChangedListener { _, _, newVal -> onLunarYearChange(newVal) }
+                                descendantFocusability = android.view.ViewGroup.FOCUS_BLOCK_DESCENDANTS
+                            }
+                        },
+                        update = { picker -> picker.value = lunarYear }
                     )
-                }
-                Spacer(modifier = Modifier.height(8.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("农历月", fontSize = 13.sp, color = AppColors.textSecondaryLight)
-                    Spacer(modifier = Modifier.weight(1f))
-                    OutlinedTextField(
-                        value = if (lunarMonth > 0) lunarMonth.toString() else "",
-                        onValueChange = { it.toIntOrNull()?.let { m -> onLunarMonthChange(m.coerceIn(1, 12)) } },
-                        modifier = Modifier.width(80.dp)
+                    // 农历月
+                    AndroidView(
+                        modifier = Modifier.weight(1f).height(160.dp),
+                        factory = { ctx ->
+                            android.widget.NumberPicker(ctx).apply {
+                                minValue = 1; maxValue = 12; value = if (lunarMonth > 0) lunarMonth else 1
+                                setDisplayedValues(arrayOf("正","二","三","四","五","六","七","八","九","十","冬","腊"))
+                                setOnValueChangedListener { _, _, newVal -> onLunarMonthChange(newVal) }
+                                descendantFocusability = android.view.ViewGroup.FOCUS_BLOCK_DESCENDANTS
+                            }
+                        },
+                        update = { picker -> picker.value = if (lunarMonth > 0) lunarMonth else 1 }
                     )
-                }
-                Spacer(modifier = Modifier.height(8.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("农历日", fontSize = 13.sp, color = AppColors.textSecondaryLight)
-                    Spacer(modifier = Modifier.weight(1f))
-                    OutlinedTextField(
-                        value = if (lunarDay > 0) lunarDay.toString() else "",
-                        onValueChange = { it.toIntOrNull()?.let { d -> onLunarDayChange(d.coerceIn(1, 30)) } },
-                        modifier = Modifier.width(80.dp)
+                    // 农历日
+                    AndroidView(
+                        modifier = Modifier.weight(1f).height(160.dp),
+                        factory = { ctx ->
+                            android.widget.NumberPicker(ctx).apply {
+                                minValue = 1; maxValue = 30; value = if (lunarDay > 0) lunarDay else 1
+                                setOnValueChangedListener { _, _, newVal -> onLunarDayChange(newVal) }
+                                descendantFocusability = android.view.ViewGroup.FOCUS_BLOCK_DESCENDANTS
+                            }
+                        },
+                        update = { picker -> picker.value = if (lunarDay > 0) lunarDay else 1 }
                     )
                 }
                 Spacer(modifier = Modifier.height(8.dp))
@@ -742,11 +752,13 @@ private fun ReminderSettingsSection(
             var showTimePicker by remember { mutableStateOf(false) }
             val context = LocalContext.current
             val timePicker = remember {
-                android.widget.TimePicker(ContextThemeWrapper(context, android.R.style.Theme_DeviceDefault_Light_Dialog_Alert)).apply {
+                android.widget.TimePicker(context).apply {
                     setIs24HourView(java.lang.Boolean.TRUE)
                     currentHour = reminderHour
                     currentMinute = reminderMinute
-                    try { javaClass.getMethod("setMode", Int::class.java).invoke(this, 1) } catch (_: Exception) {}
+                    try {
+                        javaClass.getMethod("setMode", Int::class.java).invoke(this, 1)
+                    } catch (_: Exception) {}
                 }
             }
             TextButton(onClick = { showTimePicker = true }) {
