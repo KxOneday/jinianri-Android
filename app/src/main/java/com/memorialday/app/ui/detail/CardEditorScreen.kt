@@ -677,6 +677,7 @@ private fun ReminderSettingsSection(
             Text("提醒时间", fontSize = 13.sp, color = AppColors.textSecondaryLight)
             Spacer(modifier = Modifier.height(4.dp))
             var showTimePicker by remember { mutableStateOf(false) }
+            val context = LocalContext.current
             val timePicker = remember {
                 android.widget.TimePicker(ContextThemeWrapper(context, android.R.style.Theme_DeviceDefault_Light_Dialog_Alert)).apply {
                     setIs24HourView(java.lang.Boolean.TRUE)
