@@ -435,7 +435,7 @@ private fun DateSection(
                                     c.set(Calendar.MILLISECOND, 0)
                                     onDateChange(c.time)
                                 }
-                                descendantFocusability = FOCUS_BLOCK_DESCENDANTS
+                                descendantFocusability = android.view.ViewGroup.FOCUS_BLOCK_DESCENDANTS
                             }
                         },
                         update = { picker -> picker.value = displayYear }
@@ -462,7 +462,7 @@ private fun DateSection(
                                     c.set(Calendar.MILLISECOND, 0)
                                     onDateChange(c.time)
                                 }
-                                descendantFocusability = FOCUS_BLOCK_DESCENDANTS
+                                descendantFocusability = android.view.ViewGroup.FOCUS_BLOCK_DESCENDANTS
                             }
                         },
                         update = { picker -> picker.value = displayMonth }
