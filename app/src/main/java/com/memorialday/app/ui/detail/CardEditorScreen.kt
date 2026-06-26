@@ -637,12 +637,10 @@ private fun CardStyleSection(
                 singleLine = true
             )
         }
-        // 背景色预设
+        // 背景色光谱
         Spacer(modifier = Modifier.height(6.dp))
-        ColorSwatches(
-            colors = listOf("#F5F0EB","#FFF5F5","#F0FFF0","#F0F8FF","#FFFFF0",
-                "#FFF0F5","#F5F5FF","#FFFAF0","#F5FFFA","#FAEBD7"),
-            selectedColor = bgColorHex,
+        ColorSpectrumPicker(
+            currentColor = bgColorHex,
             onColorSelected = onBgColorChange
         )
 
@@ -674,10 +672,8 @@ private fun CardStyleSection(
                 )
             }
             Spacer(modifier = Modifier.height(6.dp))
-            ColorSwatches(
-                colors = listOf("#FFE4E1","#E8F5E9","#E3F2FD","#FFF8E1","#F3E5F5",
-                    "#FFECB3","#C8E6C9","#BBDEFB","#FFCCBC","#D7CCC8"),
-                selectedColor = bgEndColorHex.ifEmpty { "#000000" },
+            ColorSpectrumPicker(
+                currentColor = bgEndColorHex.ifEmpty { "#F5F0EB" },
                 onColorSelected = onBgEndColorChange
             )
         }
@@ -701,6 +697,12 @@ private fun CardStyleSection(
                 singleLine = true
             )
         }
+        // 文字颜色光谱
+        Spacer(modifier = Modifier.height(6.dp))
+        ColorSpectrumPicker(
+            currentColor = textColorHex,
+            onColorSelected = onTextColorChange
+        )
 
         Spacer(modifier = Modifier.height(12.dp))
 
@@ -814,33 +816,96 @@ private fun ReminderSettingsSection(
     }
 }
 
-// MARK: - 颜色预设光栅
+// MARK: - 颜色光谱选择器
 
 @Composable
-private fun ColorSwatches(
-    colors: List<String>,
-    selectedColor: String,
+private fun ColorSpectrumPicker(
+    currentColor: String,
     onColorSelected: (String) -> Unit
 ) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(6.dp)
-    ) {
-        colors.forEach { hex ->
-            val isSelected = hex.equals(selectedColor, ignoreCase = true)
-            Box(
-                modifier = Modifier
-                    .size(28.dp)
-                    .clip(RoundedCornerShape(6.dp))
-                    .background(Color.fromHex(hex))
-                    .then(
-                        if (isSelected) Modifier.border(2.dp, AppColors.accent, RoundedCornerShape(6.dp))
-                        else Modifier.border(1.dp, Color.LightGray, RoundedCornerShape(6.dp))
-                    )
-                    .clickable { onColorSelected(hex) }
-            )
-        }
+    var hue by remember { mutableStateOf(colorToHue(currentColor)) }
+    var saturation by remember { mutableStateOf(colorToSaturation(currentColor)) }
+    var lightness by remember { mutableStateOf(colorToLightness(currentColor)) }
+
+    val currentColorState = remember { mutableStateOf(Color.fromHex(currentColor)) }
+
+    fun updateColor() {
+        val col = Color.hsl(hue, saturation / 100f, lightness / 100f)
+        currentColorState.value = col
+        onColorSelected(col.toHex())
     }
+
+    Column {
+        // 当前颜色预览
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(40.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .background(currentColorState.value)
+                .border(1.dp, Color.LightGray, RoundedCornerShape(8.dp))
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // 色相滑块 (Hue 0-360)
+        Text("色相", fontSize = 11.sp, color = AppColors.textSecondaryLight)
+        Slider(
+            value = hue,
+            onValueChange = { hue = it; updateColor() },
+            valueRange = 0f..360f,
+            colors = SliderDefaults.colors(thumbColor = AppColors.accent, activeTrackColor = AppColors.accent)
+        )
+
+        // 饱和度滑块 (Saturation 0-100)
+        Text("饱和度", fontSize = 11.sp, color = AppColors.textSecondaryLight)
+        Slider(
+            value = saturation,
+            onValueChange = { saturation = it; updateColor() },
+            valueRange = 0f..100f,
+            colors = SliderDefaults.colors(thumbColor = AppColors.accent, activeTrackColor = AppColors.accent)
+        )
+
+        // 亮度滑块 (Lightness 0-100)
+        Text("亮度", fontSize = 11.sp, color = AppColors.textSecondaryLight)
+        Slider(
+            value = lightness,
+            onValueChange = { lightness = it; updateColor() },
+            valueRange = 0f..100f,
+            colors = SliderDefaults.colors(thumbColor = AppColors.accent, activeTrackColor = AppColors.accent)
+        )
+
+        // 当前 Hex 值
+        Text(
+            currentColorState.value.toHex(),
+            fontSize = 13.sp,
+            color = AppColors.textSecondaryLight
+        )
+    }
+}
+
+private fun colorToHue(hex: String): Float {
+    val colorInt = android.graphics.Color.parseColor(hex)
+    val outHsv = FloatArray(3)
+    android.graphics.Color.colorToHSV(colorInt, outHsv)
+    return outHsv[0]
+}
+
+private fun colorToSaturation(hex: String): Float {
+    val colorInt = android.graphics.Color.parseColor(hex)
+    val outHsv = FloatArray(3)
+    android.graphics.Color.colorToHSV(colorInt, outHsv)
+    return outHsv[1] * 100f
+}
+
+private fun colorToLightness(hex: String): Float {
+    val colorInt = android.graphics.Color.parseColor(hex)
+    val r = android.graphics.Color.red(colorInt)
+    val g = android.graphics.Color.green(colorInt)
+    val b = android.graphics.Color.blue(colorInt)
+    val max = maxOf(r, g, b)
+    val min = minOf(r, g, b)
+    return ((max + min) / 2f / 255f * 100f)
 }
 
 // MARK: - Section 容器

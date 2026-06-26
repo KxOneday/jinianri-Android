@@ -234,9 +234,13 @@ private fun TopBar(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            TopBarButton(icon = Icons.Filled.Search, onClick = onSearchToggle)
-            TopBarButton(icon = Icons.Filled.GridView, onClick = onTemplates)
-            TopBarButton(icon = Icons.Filled.CheckCircle, onClick = onEnterSelect)
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                TopBarButton(icon = Icons.Filled.Search, onClick = onSearchToggle)
+                TopBarButton(icon = Icons.Filled.GridView, onClick = onTemplates)
+                TopBarButton(icon = Icons.Filled.CheckCircle, onClick = onEnterSelect)
+            }
         }
     }
 }
