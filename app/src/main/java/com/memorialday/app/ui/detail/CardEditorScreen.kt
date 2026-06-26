@@ -20,6 +20,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -433,32 +434,33 @@ private fun DateSection(
 }
 
 @Composable
-private fun DatePickerDialog(selectedDate: Date, onDateSelected: (Date) -> Unit) {
-    val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = selectedDate.time
-    )
-    var showDialog by remember { mutableStateOf(false) }
+// MARK: - 日期选择器（滚轮样式）
 
-    TextButton(onClick = { showDialog = true }) {
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun DatePickerDialog(selectedDate: Date, onDateSelected: (Date) -> Unit) {
+    val context = LocalContext.current
+    val cal = Calendar.getInstance()
+    cal.time = selectedDate
+
+    TextButton(onClick = {
+        android.app.DatePickerDialog(
+            context,
+            { _, year, month, day ->
+                onDateSelected(Date(Calendar.getInstance().apply {
+                    set(year, month, day, 0, 0, 0)
+                    set(Calendar.MILLISECOND, 0)
+                }.timeInMillis))
+            },
+            cal.get(Calendar.YEAR),
+            cal.get(Calendar.MONTH),
+            cal.get(Calendar.DAY_OF_MONTH)
+        ).apply {
+            datePicker.calendarViewShown = false
+        }.show()
+    }) {
         val fmt = SimpleDateFormat("yyyy年M月d日", Locale.CHINESE)
         Text(fmt.format(selectedDate), color = AppColors.primary)
-    }
-
-    if (showDialog) {
-        DatePickerDialog(
-            onDismissRequest = { showDialog = false },
-            confirmButton = {
-                TextButton(onClick = {
-                    datePickerState.selectedDateMillis?.let { onDateSelected(Date(it)) }
-                    showDialog = false
-                }) { Text("确定") }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDialog = false }) { Text("取消") }
-            }
-        ) {
-            DatePicker(state = datePickerState)
-        }
     }
 }
 
@@ -666,20 +668,25 @@ private fun ReminderSettingsSection(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("提醒时间", fontSize = 13.sp, color = AppColors.textSecondaryLight)
-                Spacer(modifier = Modifier.weight(1f))
-                OutlinedTextField(
-                    value = reminderHour.toString().padStart(2, '0'),
-                    onValueChange = { it.toIntOrNull()?.let { h -> onReminderHourChange(h.coerceIn(0, 23)) } },
-                    modifier = Modifier.width(60.dp),
-                    singleLine = true
+            Text("提醒时间", fontSize = 13.sp, color = AppColors.textSecondaryLight)
+            Spacer(modifier = Modifier.height(4.dp))
+            val context = LocalContext.current
+            TextButton(onClick = {
+                android.app.TimePickerDialog(
+                    context,
+                    { _, hour, minute ->
+                        onReminderHourChange(hour)
+                        onReminderMinuteChange(minute)
+                    },
+                    reminderHour, reminderMinute, true
+                ).show()
+            }) {
+                Text(
+                    "${reminderHour.toString().padStart(2, '0')}:${reminderMinute.toString().padStart(2, '0')}",
+                    fontSize = 20.sp,
+                    color = AppColors.primary
                 )
-                Text(":", fontSize = 16.sp)
-                OutlinedTextField(
-                    value = reminderMinute.toString().padStart(2, '0'),
-                    onValueChange = { it.toIntOrNull()?.let { m -> onReminderMinuteChange(m.coerceIn(0, 59)) } },
-                    modifier = Modifier.width(60.dp),
+            }
                     singleLine = true
                 )
             }
