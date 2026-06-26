@@ -3,7 +3,8 @@
 
 package com.memorialday.app.ui.home
 
-import androidx.compose.animation.*
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
@@ -42,10 +43,14 @@ fun MemorialCardView(
     var showDetail by remember { mutableStateOf(false) }
     var showSwipeActions by remember { mutableStateOf(false) }
     var showDeleteAlert by remember { mutableStateOf(false) }
-    var offsetX by remember { mutableFloatStateOf(0f) }
 
     val selectedDays by viewModel.selectedDays.collectAsState()
     val isSelected = selectedDays.contains(day.id)
+
+    val swipeOffset by animateFloatAsState(
+        targetValue = if (showSwipeActions) -160f else 0f,
+        animationSpec = spring(dampingRatio = 0.7f, stiffness = 300f)
+    )
 
     // 删除确认弹窗
     if (showDeleteAlert) {
@@ -57,14 +62,10 @@ fun MemorialCardView(
                     viewModel.deleteDay(day.id)
                     showDeleteAlert = false
                     showSwipeActions = false
-                }) {
-                    Text("删除", color = AppColors.error)
-                }
+                }) { Text("删除", color = AppColors.error) }
             },
             dismissButton = {
-                TextButton(onClick = { showDeleteAlert = false; showSwipeActions = false }) {
-                    Text("取消")
-                }
+                TextButton(onClick = { showDeleteAlert = false; showSwipeActions = false }) { Text("取消") }
             }
         )
     }
@@ -75,7 +76,7 @@ fun MemorialCardView(
     }
 
     Box(modifier = modifier) {
-        // 左侧操作按钮（滑动显示）
+        // 操作按钮（在滑动时固定显示在右侧）
         if (showSwipeActions) {
             Row(
                 modifier = Modifier
@@ -86,38 +87,27 @@ fun MemorialCardView(
                 // 置顶按钮
                 Column(
                     modifier = Modifier
-                        .width(72.dp)
-                        .height(100.dp)
+                        .width(72.dp).height(100.dp)
                         .clip(RoundedCornerShape(14.dp))
                         .background(AppColors.primary)
-                        .clickable {
-                            viewModel.togglePin(day.id)
-                            showSwipeActions = false
-                        },
+                        .clickable { viewModel.togglePin(day.id); showSwipeActions = false },
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    Icon(
-                        if (day.isPinned) Icons.Filled.PushPin else Icons.Filled.PushPin,
-                        null,
-                        modifier = Modifier.size(18.dp),
-                        tint = Color.White
-                    )
+                    Icon(Icons.Filled.PushPin, null, Modifier.size(18.dp), tint = Color.White)
                     Text(if (day.isPinned) "取消置顶" else "置顶", fontSize = 11.sp, color = Color.White)
                 }
-
                 // 删除按钮
                 Column(
                     modifier = Modifier
-                        .width(72.dp)
-                        .height(100.dp)
+                        .width(72.dp).height(100.dp)
                         .clip(RoundedCornerShape(14.dp))
                         .background(AppColors.error)
                         .clickable { showDeleteAlert = true },
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    Icon(Icons.Filled.Delete, null, modifier = Modifier.size(18.dp), tint = Color.White)
+                    Icon(Icons.Filled.Delete, null, Modifier.size(18.dp), tint = Color.White)
                     Text("删除", fontSize = 11.sp, color = Color.White)
                 }
             }
@@ -131,19 +121,13 @@ fun MemorialCardView(
             onToggleSelect = { viewModel.toggleSelection(day.id) },
             onClick = { showDetail = true },
             modifier = Modifier
-                .offset { IntOffset(offsetX.roundToInt(), 0) }
+                .offset { IntOffset(swipeOffset.roundToInt(), 0) }
                 .pointerInput(Unit) {
                     detectHorizontalDragGestures(
-                        onDragEnd = {
-                            if (offsetX < -160f) {
-                                showSwipeActions = true
-                            } else if (offsetX > 160f) {
-                                showSwipeActions = false
-                            }
-                            offsetX = 0f
-                        },
+                        onDragEnd = { },
                         onHorizontalDrag = { _, dragAmount ->
-                            offsetX += dragAmount
+                            val newOffset = (swipeOffset + dragAmount).coerceIn(-200f, 0f)
+                            if (newOffset < -160f) showSwipeActions = true
                         }
                     )
                 }
@@ -168,9 +152,7 @@ private fun CardContent(
             .clip(RoundedCornerShape(day.cornerRadius.dp))
             .background(
                 if (day.showGradient && day.backgroundEndColorHex != null) {
-                    Brush.linearGradient(
-                        listOf(bgColor, Color.fromHex(day.backgroundEndColorHex!!))
-                    )
+                    Brush.linearGradient(listOf(bgColor, Color.fromHex(day.backgroundEndColorHex!!)))
                 } else {
                     Brush.linearGradient(listOf(bgColor, bgColor))
                 }
@@ -179,14 +161,11 @@ private fun CardContent(
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // 选择模式：左侧选择圈
         if (isSelectMode) {
             Icon(
                 if (isSelected) Icons.Filled.CheckCircle else Icons.Filled.Circle,
                 null,
-                modifier = Modifier
-                    .size(24.dp)
-                    .padding(start = 4.dp),
+                modifier = Modifier.size(24.dp).padding(start = 4.dp),
                 tint = if (isSelected) AppColors.accent else AppColors.textTertiaryLight
             )
             Spacer(modifier = Modifier.width(16.dp))
@@ -194,106 +173,48 @@ private fun CardContent(
 
         // 左侧图标 + 天数
         Box(
-            modifier = Modifier
-                .size(72.dp)
-                .clip(CircleShape)
-                .background(
-                    Brush.linearGradient(
-                        listOf(bgColor.copy(alpha = 0.4f), bgColor.copy(alpha = 0.2f))
-                    )
-                ),
+            modifier = Modifier.size(72.dp).clip(CircleShape).background(
+                Brush.linearGradient(listOf(bgColor.copy(alpha = 0.4f), bgColor.copy(alpha = 0.2f)))
+            ),
             contentAlignment = Alignment.Center
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(
-                    Icons.Filled.Favorite,
-                    null,
-                    modifier = Modifier.size(16.dp),
-                    tint = textColor.copy(alpha = 0.7f)
-                )
-                Text(
-                    "${day.displayDayCount}",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = if (day.dayType.name == "COUNTDOWN") AppColors.info else AppColors.success
-                )
-                Text(
-                    if (day.dayType.name == "COUNTDOWN") "天后" else "天前",
-                    fontSize = 10.sp,
-                    color = textColor.copy(alpha = 0.6f)
-                )
+                Icon(Icons.Filled.Favorite, null, Modifier.size(16.dp), tint = textColor.copy(alpha = 0.7f))
+                Text("${day.displayDayCount}", fontSize = 24.sp, fontWeight = FontWeight.Bold,
+                    color = if (day.dayType.name == "COUNTDOWN") AppColors.info else AppColors.success)
+                Text(if (day.dayType.name == "COUNTDOWN") "天后" else "天前", fontSize = 10.sp,
+                    color = textColor.copy(alpha = 0.6f))
             }
         }
 
         Spacer(modifier = Modifier.width(16.dp))
 
-        // 中间文字
         Column(modifier = Modifier.weight(1f)) {
-            Text(
-                day.title,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = textColor,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-
-            Text(
-                day.subtitle,
-                fontSize = 12.sp,
-                color = textColor.copy(alpha = 0.6f)
-            )
-
+            Text(day.title, fontSize = 18.sp, fontWeight = FontWeight.SemiBold, color = textColor,
+                maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(day.subtitle, fontSize = 12.sp, color = textColor.copy(alpha = 0.6f))
             if (day.notes.isNotEmpty()) {
-                Text(
-                    day.notes,
-                    fontSize = 11.sp,
-                    color = textColor.copy(alpha = 0.5f),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
+                Text(day.notes, fontSize = 11.sp, color = textColor.copy(alpha = 0.5f),
+                    maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
-
-            // 标签
             if (day.tags.isNotEmpty()) {
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     day.tags.take(3).forEach { tag ->
-                        Surface(
-                            shape = RoundedCornerShape(10.dp),
-                            color = textColor.copy(alpha = 0.1f)
-                        ) {
-                            Text(
-                                "#$tag",
-                                fontSize = 10.sp,
-                                color = textColor.copy(alpha = 0.6f),
-                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                            )
+                        Surface(shape = RoundedCornerShape(10.dp), color = textColor.copy(alpha = 0.1f)) {
+                            Text("#$tag", fontSize = 10.sp, color = textColor.copy(alpha = 0.6f),
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp))
                         }
                     }
                 }
             }
         }
 
-        // 右侧箭头
-        Icon(
-            Icons.Filled.ChevronRight,
-            null,
-            modifier = Modifier.size(14.dp),
-            tint = textColor.copy(alpha = 0.4f)
-        )
+        Icon(Icons.Filled.ChevronRight, null, Modifier.size(14.dp), tint = textColor.copy(alpha = 0.4f))
 
-        // 置顶标记
         if (day.isPinned) {
             Box(modifier = Modifier.align(Alignment.Top)) {
-                Icon(
-                    Icons.Filled.PushPin,
-                    null,
-                    modifier = Modifier.size(12.dp).padding(8.dp),
-                    tint = AppColors.warning
-                )
+                Icon(Icons.Filled.PushPin, null, Modifier.size(12.dp).padding(8.dp), tint = AppColors.warning)
             }
         }
     }
 }
-
-// Overlay: 置顶标记放在右上角需要重组 Parent
