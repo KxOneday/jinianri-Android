@@ -348,6 +348,7 @@ private fun BasicInfoSection(
 
 // MARK: - 日期选择
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DateSection(
     targetDate: Date, onDateChange: (Date) -> Unit,
