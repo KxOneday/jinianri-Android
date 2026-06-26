@@ -28,6 +28,7 @@ import com.memorialday.app.ui.theme.AppColors
 import com.memorialday.app.viewmodels.*
 import java.util.*
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DateCalculatorScreen(modifier: Modifier = Modifier) {
     val viewModel = remember { DateCalculatorViewModel() }
@@ -134,34 +135,35 @@ private fun ResultCard(content: @Composable ColumnScope.() -> Unit) {
     }
 }
 
-private val calculateButton: @Composable (() -> Unit) -> Unit
-    get() = { onClick ->
-        Button(
-            onClick = onClick,
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(14.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
+@Composable
+private fun CalculateButton(onClick: () -> Unit) {
+    Button(
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(14.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    Brush.horizontalGradient(listOf(AppColors.accent, AppColors.primaryLight)),
+                    RoundedCornerShape(14.dp)
+                )
+                .padding(vertical = 14.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        Brush.horizontalGradient(listOf(AppColors.accent, AppColors.primaryLight)),
-                        RoundedCornerShape(14.dp)
-                    )
-                    .padding(vertical = 14.dp),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(Icons.Filled.PlayArrow, null, modifier = Modifier.size(12.dp), tint = Color.White)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("计算", fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = Color.White)
-            }
+            Icon(Icons.Filled.PlayArrow, null, modifier = Modifier.size(12.dp), tint = Color.White)
+            Spacer(modifier = Modifier.width(8.dp))
+            Text("计算", fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = Color.White)
         }
     }
+}
 
 // MARK: - 日期行
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DateRow(label: String, date: Date, onDateChange: (Date) -> Unit) {
     var showDialog by remember { mutableStateOf(false) }
@@ -232,7 +234,7 @@ private fun IntervalView(viewModel: DateCalculatorViewModel) {
         Text("排除周末（仅计算工作日）", fontSize = 13.sp, color = AppColors.textSecondaryLight)
     }
 
-    calculateButton { viewModel.calculateInterval() }
+    CalculateButton(onClick = { viewModel.calculateInterval() })
 
     intervalResult?.let { result ->
         ResultCard {
@@ -317,7 +319,7 @@ private fun DateCalcView(viewModel: DateCalculatorViewModel) {
         }
     }
 
-    calculateButton { viewModel.calculateDateOffset() }
+    CalculateButton(onClick = { viewModel.calculateDateOffset() })
 
     calcResult?.let { result ->
         ResultCard {
@@ -452,7 +454,7 @@ private fun WorkdayView(viewModel: DateCalculatorViewModel) {
         Text("自动排除周六、周日，仅计算工作日", fontSize = 13.sp, color = AppColors.textSecondaryLight)
     }
 
-    calculateButton { viewModel.calculateWorkdays() }
+    CalculateButton(onClick = { viewModel.calculateWorkdays() })
 
     workdayResult?.let { result ->
         ResultCard {

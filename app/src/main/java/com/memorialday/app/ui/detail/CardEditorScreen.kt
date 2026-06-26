@@ -244,7 +244,7 @@ private fun saveDay(
         )
     )
 
-    if (isEditing && viewModel.days.collectAsState().value.any { it.id == day.id }) {
+    if (isEditing && viewModel.days.value.any { it.id == day.id }) {
         viewModel.updateDay(day)
     } else {
         viewModel.addDay(day)

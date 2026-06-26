@@ -232,7 +232,7 @@ private fun TopBar(
 
             TopBarButton(icon = Icons.Filled.Search, onClick = onSearchToggle)
             TopBarButton(icon = Icons.Filled.GridView, onClick = onTemplates)
-            TopBarButton(icon = Icons.Filled.CheckCircleOutline, onClick = onEnterSelect)
+            TopBarButton(icon = Icons.Filled.CheckCircle, onClick = onEnterSelect)
         }
     }
 }

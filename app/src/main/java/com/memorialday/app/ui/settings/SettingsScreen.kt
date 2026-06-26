@@ -28,6 +28,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
     val settingsVM = remember { SettingsViewModel.getInstance() }
     val requirePassword by settingsVM.requirePassword.collectAsState()
     val notificationsEnabled by settingsVM.notificationsEnabled.collectAsState()
+    val appPassword by settingsVM.appPassword.collectAsState()
 
     var showPasswordSetup by remember { mutableStateOf(false) }
     var passwordInput by remember { mutableStateOf("") }
@@ -52,7 +53,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                 Switch(
                     checked = requirePassword,
                     onCheckedChange = {
-                        if (it && settingsVM.appPassword.collectAsState().value.isEmpty()) {
+                        if (it && appPassword.isEmpty()) {
                             showPasswordSetup = true
                         }
                         settingsVM.setRequirePassword(it)
@@ -123,7 +124,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
         AlertDialog(
             onDismissRequest = {
                 showPasswordSetup = false
-                if (settingsVM.appPassword.collectAsState().value.isEmpty()) {
+                if (appPassword.isEmpty()) {
                     settingsVM.setRequirePassword(false)
                 }
             },

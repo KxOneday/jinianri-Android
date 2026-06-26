@@ -49,7 +49,7 @@ fun CardDetailScreen(
             kotlinx.coroutines.delay(1000)
             currentSeconds++
             // 从 ViewModel 刷新最新数据
-            viewModel.days.collectAsState().value.find { it.id == day.id }?.let {
+            viewModel.days.value.find { it.id == day.id }?.let {
                 currentDay = it
             }
         }
@@ -58,7 +58,7 @@ fun CardDetailScreen(
     // 编辑器关闭后刷新
     LaunchedEffect(showEditor) {
         if (!showEditor) {
-            viewModel.days.collectAsState().value.find { it.id == day.id }?.let {
+            viewModel.days.value.find { it.id == day.id }?.let {
                 currentDay = it
             }
             viewModel.refreshDisplay()
