@@ -353,7 +353,7 @@ private fun BasicInfoSection(
     }
 }
 
-// MARK: - 日期选择
+// MARK: - 日期设置（滚轮选择器）
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -365,110 +365,173 @@ private fun DateSection(
     lunarDay: Int, onLunarDayChange: (Int) -> Unit,
     isLeapMonth: Boolean, onLeapMonthChange: (Boolean) -> Unit
 ) {
-    SectionContainer("日期") {
-        if (!useLunarCalendar) {
-            // 公历 DatePicker
-            DatePickerDialog(
-                selectedDate = targetDate,
-                onDateSelected = onDateChange
+    val cal = Calendar.getInstance()
+    cal.time = targetDate
+    var displayYear = cal.get(Calendar.YEAR)
+    var displayMonth = cal.get(Calendar.MONTH) + 1
+
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(AppRadius.md.dp),
+        color = AppColors.secondaryBgLight
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            // 模块标题：日期设置（加粗）
+            Text(
+                "日期设置",
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Bold,
+                color = AppColors.textPrimaryLight
             )
-        } else {
-            // 农历选择器（简化：使用下拉菜单）
-            // 年份
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("农历年", fontSize = 13.sp, color = AppColors.textSecondaryLight)
-                Spacer(modifier = Modifier.weight(1f))
-                // 简化年份输入
-                OutlinedTextField(
-                    value = lunarYear.toString(),
-                    onValueChange = { it.toIntOrNull()?.let { y -> onLunarYearChange(y) } },
-                    modifier = Modifier.width(100.dp)
-                )
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-            // 月份
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("农历月", fontSize = 13.sp, color = AppColors.textSecondaryLight)
-                Spacer(modifier = Modifier.weight(1f))
-                OutlinedTextField(
-                    value = if (lunarMonth > 0) lunarMonth.toString() else "",
-                    onValueChange = { it.toIntOrNull()?.let { m -> onLunarMonthChange(m.coerceIn(1, 12)) } },
-                    modifier = Modifier.width(80.dp),
-                    placeholder = { Text("月") }
-                )
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-            // 日
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("农历日", fontSize = 13.sp, color = AppColors.textSecondaryLight)
-                Spacer(modifier = Modifier.weight(1f))
-                OutlinedTextField(
-                    value = if (lunarDay > 0) lunarDay.toString() else "",
-                    onValueChange = { it.toIntOrNull()?.let { d -> onLunarDayChange(d.coerceIn(1, 30)) } },
-                    modifier = Modifier.width(80.dp),
-                    placeholder = { Text("日") }
-                )
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-            // 闰月
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("闰月", fontSize = 14.sp, color = AppColors.textPrimaryLight)
-                Spacer(modifier = Modifier.weight(1f))
-                Switch(checked = isLeapMonth, onCheckedChange = onLeapMonthChange)
-            }
-        }
 
-        Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
-        // 历法切换
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text("使用农历", fontSize = 15.sp, color = AppColors.textPrimaryLight)
-                Text(
-                    if (useLunarCalendar) "直接设置农历月日，自动换算公历" else "开启后直接输入农历日期",
-                    fontSize = 11.sp,
-                    color = AppColors.textSecondaryLight
+            if (!useLunarCalendar) {
+                // ---------- 公历：年月滚轮选择器 ----------
+                // 顶部展示当前选中年月（粉色文字+下拉箭头）
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        Icons.Filled.CalendarMonth,
+                        null,
+                        modifier = Modifier.size(18.dp),
+                        tint = AppColors.accent
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        "${displayYear}年${displayMonth}月",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = AppColors.accent
+                    )
+                    Icon(
+                        Icons.Filled.KeyboardArrowDown,
+                        null,
+                        modifier = Modifier.size(20.dp),
+                        tint = AppColors.accent
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // 年月滚轮区域：左右两列
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    // 年份选择
+                    AndroidView(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(160.dp),
+                        factory = { ctx ->
+                            android.widget.NumberPicker(ctx).apply {
+                                minValue = 1901
+                                maxValue = 2999
+                                value = displayYear
+                                setOnValueChangedListener { _, _, newVal ->
+                                    displayYear = newVal
+                                    val c = Calendar.getInstance()
+                                    c.set(newVal, displayMonth - 1, 1, 0, 0, 0)
+                                    c.set(Calendar.MILLISECOND, 0)
+                                    onDateChange(c.time)
+                                }
+                                descendantFocusability = FOCUS_BLOCK_DESCENDANTS
+                            }
+                        },
+                        update = { picker -> picker.value = displayYear }
+                    )
+
+                    // 月份选择
+                    AndroidView(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(160.dp),
+                        factory = { ctx ->
+                            android.widget.NumberPicker(ctx).apply {
+                                minValue = 1
+                                maxValue = 12
+                                value = displayMonth
+                                setDisplayedValues(
+                                    arrayOf("1月","2月","3月","4月","5月","6月",
+                                        "7月","8月","9月","10月","11月","12月")
+                                )
+                                setOnValueChangedListener { _, _, newVal ->
+                                    displayMonth = newVal
+                                    val c = Calendar.getInstance()
+                                    c.set(displayYear, newVal - 1, 1, 0, 0, 0)
+                                    c.set(Calendar.MILLISECOND, 0)
+                                    onDateChange(c.time)
+                                }
+                                descendantFocusability = FOCUS_BLOCK_DESCENDANTS
+                            }
+                        },
+                        update = { picker -> picker.value = displayMonth }
+                    )
+                }
+            } else {
+                // ---------- 农历：文本输入 ----------
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("农历年", fontSize = 13.sp, color = AppColors.textSecondaryLight)
+                    Spacer(modifier = Modifier.weight(1f))
+                    OutlinedTextField(
+                        value = lunarYear.toString(),
+                        onValueChange = { it.toIntOrNull()?.let { y -> onLunarYearChange(y) } },
+                        modifier = Modifier.width(100.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("农历月", fontSize = 13.sp, color = AppColors.textSecondaryLight)
+                    Spacer(modifier = Modifier.weight(1f))
+                    OutlinedTextField(
+                        value = if (lunarMonth > 0) lunarMonth.toString() else "",
+                        onValueChange = { it.toIntOrNull()?.let { m -> onLunarMonthChange(m.coerceIn(1, 12)) } },
+                        modifier = Modifier.width(80.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("农历日", fontSize = 13.sp, color = AppColors.textSecondaryLight)
+                    Spacer(modifier = Modifier.weight(1f))
+                    OutlinedTextField(
+                        value = if (lunarDay > 0) lunarDay.toString() else "",
+                        onValueChange = { it.toIntOrNull()?.let { d -> onLunarDayChange(d.coerceIn(1, 30)) } },
+                        modifier = Modifier.width(80.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("闰月", fontSize = 14.sp, color = AppColors.textPrimaryLight)
+                    Spacer(modifier = Modifier.weight(1f))
+                    Switch(checked = isLeapMonth, onCheckedChange = onLeapMonthChange)
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+            Divider(color = AppColors.textTertiaryLight.copy(alpha = 0.3f))
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // 历法切换
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text("使用农历", fontSize = 15.sp, color = AppColors.textPrimaryLight)
+                    Text(
+                        if (useLunarCalendar) "直接设置农历月日，自动换算公历"
+                        else "开启后直接输入农历日期",
+                        fontSize = 11.sp,
+                        color = AppColors.textSecondaryLight
+                    )
+                }
+                Switch(
+                    checked = useLunarCalendar,
+                    onCheckedChange = { onUseLunarChange(it) }
                 )
             }
-            Switch(checked = useLunarCalendar, onCheckedChange = { onUseLunarChange(it) })
         }
     }
 }
 
 // MARK: - 日期选择器（滚轮样式）
-
-@Composable
-private fun DatePickerDialog(selectedDate: Date, onDateSelected: (Date) -> Unit) {
-    val context = LocalContext.current
-    val cal = Calendar.getInstance()
-    cal.time = selectedDate
-
-    TextButton(onClick = {
-        val styledContext = ContextThemeWrapper(context, android.R.style.Theme_DeviceDefault_Light_Dialog_Alert)
-        val dialog = android.app.DatePickerDialog(
-            styledContext,
-            { _, year, month, day ->
-                onDateSelected(Date(Calendar.getInstance().apply {
-                    set(year, month, day, 0, 0, 0)
-                    set(Calendar.MILLISECOND, 0)
-                }.timeInMillis))
-            },
-            cal.get(Calendar.YEAR),
-            cal.get(Calendar.MONTH),
-            cal.get(Calendar.DAY_OF_MONTH)
-        )
-        // 强制使用滚轮模式（API 21+）
-        try {
-            val dp = dialog.datePicker
-            dp.javaClass.getMethod("setCalendarViewShown", Boolean::class.java).invoke(dp, false)
-            dp.javaClass.getMethod("setMode", Int::class.java).invoke(dp, 1) // 1 = MODE_SPINNER
-        } catch (_: Exception) {}
-        dialog.show()
-    }) {
-        val fmt = SimpleDateFormat("yyyy年M月d日", Locale.CHINESE)
-        Text(fmt.format(selectedDate), color = AppColors.primary)
-    }
-}
 
 // MARK: - 分类与标签
 
