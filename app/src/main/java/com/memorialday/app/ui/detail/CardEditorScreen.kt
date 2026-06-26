@@ -7,6 +7,7 @@ package com.memorialday.app.ui.detail
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -636,6 +637,14 @@ private fun CardStyleSection(
                 singleLine = true
             )
         }
+        // 背景色预设
+        Spacer(modifier = Modifier.height(6.dp))
+        ColorSwatches(
+            colors = listOf("#F5F0EB","#FFF5F5","#F0FFF0","#F0F8FF","#FFFFF0",
+                "#FFF0F5","#F5F5FF","#FFFAF0","#F5FFFA","#FAEBD7"),
+            selectedColor = bgColorHex,
+            onColorSelected = onBgColorChange
+        )
 
         Spacer(modifier = Modifier.height(12.dp))
 
@@ -664,6 +673,13 @@ private fun CardStyleSection(
                     singleLine = true
                 )
             }
+            Spacer(modifier = Modifier.height(6.dp))
+            ColorSwatches(
+                colors = listOf("#FFE4E1","#E8F5E9","#E3F2FD","#FFF8E1","#F3E5F5",
+                    "#FFECB3","#C8E6C9","#BBDEFB","#FFCCBC","#D7CCC8"),
+                selectedColor = bgEndColorHex.ifEmpty { "#000000" },
+                onColorSelected = onBgEndColorChange
+            )
         }
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -794,6 +810,35 @@ private fun ReminderSettingsSection(
                 Spacer(modifier = Modifier.weight(1f))
                 Switch(checked = isYearlyRepeat, onCheckedChange = onYearlyRepeatChange)
             }
+        }
+    }
+}
+
+// MARK: - 颜色预设光栅
+
+@Composable
+private fun ColorSwatches(
+    colors: List<String>,
+    selectedColor: String,
+    onColorSelected: (String) -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        colors.forEach { hex ->
+            val isSelected = hex.equals(selectedColor, ignoreCase = true)
+            Box(
+                modifier = Modifier
+                    .size(28.dp)
+                    .clip(RoundedCornerShape(6.dp))
+                    .background(Color.fromHex(hex))
+                    .then(
+                        if (isSelected) Modifier.border(2.dp, AppColors.accent, RoundedCornerShape(6.dp))
+                        else Modifier.border(1.dp, Color.LightGray, RoundedCornerShape(6.dp))
+                    )
+                    .clickable { onColorSelected(hex) }
+            )
         }
     }
 }

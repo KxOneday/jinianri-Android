@@ -65,7 +65,7 @@ private fun ModePicker(selectedMode: CalculatorMode, onModeSelected: (Calculator
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 8.dp, vertical = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(0.dp)
+        horizontalArrangement = Arrangement.spacedBy(6.dp)
     ) {
         CalculatorMode.entries.forEach { mode ->
             val isSelected = selectedMode == mode
