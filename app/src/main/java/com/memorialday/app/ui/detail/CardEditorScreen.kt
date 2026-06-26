@@ -369,6 +369,14 @@ private fun DateSection(
     cal.time = targetDate
     var displayYear = cal.get(Calendar.YEAR)
     var displayMonth = cal.get(Calendar.MONTH) + 1
+    var displayDay = cal.get(Calendar.DAY_OF_MONTH)
+
+    fun updateDate() {
+        val c = Calendar.getInstance()
+        c.set(displayYear, displayMonth - 1, displayDay, 0, 0, 0)
+        c.set(Calendar.MILLISECOND, 0)
+        onDateChange(c.time)
+    }
 
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -401,7 +409,7 @@ private fun DateSection(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        "${displayYear}年${displayMonth}月",
+                        "${displayYear}年${displayMonth}月${displayDay}日",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = AppColors.accent
@@ -416,56 +424,50 @@ private fun DateSection(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // 年月滚轮区域：左右两列
+                // 年月日滚轮区域：三列
                 Row(modifier = Modifier.fillMaxWidth()) {
                     // 年份选择
                     AndroidView(
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(160.dp),
+                        modifier = Modifier.weight(1f).height(160.dp),
                         factory = { ctx ->
                             android.widget.NumberPicker(ctx).apply {
-                                minValue = 1901
-                                maxValue = 2999
-                                value = displayYear
+                                minValue = 1901; maxValue = 2999; value = displayYear
                                 setOnValueChangedListener { _, _, newVal ->
-                                    displayYear = newVal
-                                    val c = Calendar.getInstance()
-                                    c.set(newVal, displayMonth - 1, 1, 0, 0, 0)
-                                    c.set(Calendar.MILLISECOND, 0)
-                                    onDateChange(c.time)
+                                    displayYear = newVal; updateDate()
                                 }
                                 descendantFocusability = android.view.ViewGroup.FOCUS_BLOCK_DESCENDANTS
                             }
                         },
                         update = { picker -> picker.value = displayYear }
                     )
-
                     // 月份选择
                     AndroidView(
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(160.dp),
+                        modifier = Modifier.weight(1f).height(160.dp),
                         factory = { ctx ->
                             android.widget.NumberPicker(ctx).apply {
-                                minValue = 1
-                                maxValue = 12
-                                value = displayMonth
-                                setDisplayedValues(
-                                    arrayOf("1月","2月","3月","4月","5月","6月",
-                                        "7月","8月","9月","10月","11月","12月")
-                                )
+                                minValue = 1; maxValue = 12; value = displayMonth
+                                setDisplayedValues(arrayOf("1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"))
                                 setOnValueChangedListener { _, _, newVal ->
-                                    displayMonth = newVal
-                                    val c = Calendar.getInstance()
-                                    c.set(displayYear, newVal - 1, 1, 0, 0, 0)
-                                    c.set(Calendar.MILLISECOND, 0)
-                                    onDateChange(c.time)
+                                    displayMonth = newVal; updateDate()
                                 }
                                 descendantFocusability = android.view.ViewGroup.FOCUS_BLOCK_DESCENDANTS
                             }
                         },
                         update = { picker -> picker.value = displayMonth }
+                    )
+                    // 日选择
+                    AndroidView(
+                        modifier = Modifier.weight(1f).height(160.dp),
+                        factory = { ctx ->
+                            android.widget.NumberPicker(ctx).apply {
+                                minValue = 1; maxValue = 31; value = displayDay
+                                setOnValueChangedListener { _, _, newVal ->
+                                    displayDay = newVal; updateDate()
+                                }
+                                descendantFocusability = android.view.ViewGroup.FOCUS_BLOCK_DESCENDANTS
+                            }
+                        },
+                        update = { picker -> picker.value = displayDay }
                     )
                 }
             } else {
