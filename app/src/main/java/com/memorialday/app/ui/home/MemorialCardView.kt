@@ -37,10 +37,10 @@ import kotlin.math.roundToInt
 fun MemorialCardView(
     day: MemorialDay,
     isSelectMode: Boolean,
+    onCardTap: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val viewModel = remember { MemorialDayViewModel.getInstance() }
-    var showDetail by remember { mutableStateOf(false) }
     var showSwipeActions by remember { mutableStateOf(false) }
     var showDeleteAlert by remember { mutableStateOf(false) }
 
@@ -68,11 +68,6 @@ fun MemorialCardView(
                 TextButton(onClick = { showDeleteAlert = false; showSwipeActions = false }) { Text("取消") }
             }
         )
-    }
-
-    // 详情页
-    if (showDetail) {
-        CardDetailScreen(day = day, onDismiss = { showDetail = false })
     }
 
     Box(modifier = modifier) {
@@ -119,7 +114,7 @@ fun MemorialCardView(
             isSelected = isSelected,
             isSelectMode = isSelectMode,
             onToggleSelect = { viewModel.toggleSelection(day.id) },
-            onClick = { showDetail = true },
+            onCardTap = onCardTap,
             modifier = Modifier
                 .offset { IntOffset(swipeOffset.roundToInt(), 0) }
                 .pointerInput(Unit) {
@@ -140,7 +135,7 @@ private fun CardContent(
     isSelected: Boolean,
     isSelectMode: Boolean,
     onToggleSelect: () -> Unit,
-    onClick: () -> Unit,
+    onCardTap: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val bgColor = Color.fromHex(day.backgroundColorHex)
@@ -156,7 +151,7 @@ private fun CardContent(
                     Brush.linearGradient(listOf(bgColor, bgColor))
                 }
             )
-            .clickable { if (isSelectMode) onToggleSelect() else onClick() }
+            .clickable { if (isSelectMode) onToggleSelect() else onCardTap() }
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

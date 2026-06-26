@@ -142,7 +142,7 @@ data class MemorialDay(
         get() {
             val formatter = java.text.SimpleDateFormat("yyyy年M月d日", java.util.Locale.CHINESE)
             val dateStr = formatter.format(targetDate)
-            if (useLunarCalendar && lunarMonth != null && lunarDay != null) {
+            if (useLunarCalendar && lunarMonth != null && lunarDay != null && lunarMonth!! > 0 && lunarDay!! > 0) {
                 return "农历 ${lunarMonth}月${lunarDay}日 · $dateStr"
             }
             return dateStr

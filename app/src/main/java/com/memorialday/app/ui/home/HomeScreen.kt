@@ -30,6 +30,7 @@ import com.memorialday.app.models.MemorialDay
 import com.memorialday.app.ui.components.FilterChip
 import com.memorialday.app.ui.components.StatBadge
 import com.memorialday.app.ui.components.UpcomingMiniCard
+import com.memorialday.app.ui.detail.CardDetailScreen
 import com.memorialday.app.ui.detail.CardEditorScreen
 import com.memorialday.app.ui.templates.TemplatePickerScreen
 import com.memorialday.app.ui.theme.AppColors
@@ -51,6 +52,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
     var showNewEditor by remember { mutableStateOf(false) }
     var showSearch by remember { mutableStateOf(false) }
     var showTemplates by remember { mutableStateOf(false) }
+    var selectedDayForDetail by remember { mutableStateOf<MemorialDay?>(null) }
     var isSelectMode by remember { mutableStateOf(false) }
     var searchText by remember { mutableStateOf("") }
 
@@ -125,6 +127,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                         MemorialCardView(
                             day = day,
                             isSelectMode = isSelectMode,
+                            onCardTap = { selectedDayForDetail = day },
                             modifier = Modifier.padding(horizontal = AppSpacing.lg.dp)
                         )
                         Spacer(modifier = Modifier.height(14.dp))
@@ -159,6 +162,9 @@ fun HomeScreen(modifier: Modifier = Modifier) {
     }
     if (showTemplates) {
         TemplatePickerScreen(onDismiss = { showTemplates = false })
+    }
+    selectedDayForDetail?.let { day ->
+        CardDetailScreen(day = day, onDismiss = { selectedDayForDetail = null })
     }
 }
 
