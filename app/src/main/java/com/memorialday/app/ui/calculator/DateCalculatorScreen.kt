@@ -176,7 +176,7 @@ private fun DateRow(label: String, date: Date, onDateChange: (Date) -> Unit) {
         Icon(Icons.Filled.CalendarMonth, null, modifier = Modifier.size(16.dp), tint = AppColors.accent)
         Spacer(modifier = Modifier.width(12.dp))
         Text(label, fontSize = 14.sp, color = AppColors.textPrimaryLight)
-        Spacer()
+        Spacer(modifier = Modifier.width(12.dp))
         TextButton(onClick = { showDialog = true }) {
             Text(fmt.format(date), fontSize = 14.sp, color = AppColors.primary)
         }
@@ -278,7 +278,7 @@ private fun DateCalcView(viewModel: DateCalculatorViewModel) {
         // 方向
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text("方向", fontSize = 13.sp, color = AppColors.textSecondaryLight)
-            Spacer()
+            Spacer(modifier = Modifier.width(12.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 com.memorialday.app.ui.components.FilterChip("未来", null, calcDirection) { viewModel.setCalcDirection(true) }
                 com.memorialday.app.ui.components.FilterChip("过去", null, !calcDirection) { viewModel.setCalcDirection(false) }
@@ -287,7 +287,7 @@ private fun DateCalcView(viewModel: DateCalculatorViewModel) {
         Divider(modifier = Modifier.padding(vertical = 8.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text("数量", fontSize = 13.sp, color = AppColors.textSecondaryLight)
-            Spacer()
+            Spacer(modifier = Modifier.width(12.dp))
             OutlinedTextField(
                 value = calcValue.toString(),
                 onValueChange = { it.toIntOrNull()?.let { v -> viewModel.setCalcValue(v) } },

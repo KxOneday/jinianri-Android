@@ -65,7 +65,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
             if (requirePassword) {
                 TextButton(onClick = { showPasswordSetup = true }) {
                     Text("修改密码", color = AppColors.primary, fontSize = 14.sp)
-                    Spacer()
+                    Spacer(modifier = Modifier.weight(1f))
                     Icon(Icons.Filled.ChevronRight, null, modifier = Modifier.size(12.dp), tint = AppColors.textTertiaryLight)
                 }
             }
@@ -87,7 +87,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
 
             TextButton(onClick = { /* 打开系统通知设置 */ }) {
                 Text("系统通知设置", color = AppColors.primary, fontSize = 14.sp)
-                Spacer()
+                Spacer(modifier = Modifier.weight(1f))
                 Icon(Icons.Filled.OpenInNew, null, modifier = Modifier.size(12.dp), tint = AppColors.textTertiaryLight)
             }
 
@@ -104,14 +104,14 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
             InfoRow("版本", "v${AppConfig.APP_VERSION} (Build ${AppConfig.BUILD_NUMBER})")
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text("数据安全", fontSize = 14.sp, color = AppColors.textSecondaryLight)
-                Spacer()
+                Spacer(modifier = Modifier.weight(1f))
                 Icon(Icons.Filled.Lock, null, modifier = Modifier.size(10.dp), tint = AppColors.success)
                 Spacer(modifier = Modifier.width(4.dp))
                 Text("AES-256 本地加密", fontSize = 12.sp, color = AppColors.success)
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text("作者", fontSize = 14.sp, color = AppColors.textSecondaryLight)
-                Spacer()
+                Spacer(modifier = Modifier.weight(1f))
                 Text("Felix.", fontSize = 14.sp, color = AppColors.primary)
             }
         }
@@ -176,7 +176,7 @@ private fun SectionCard(title: String, content: @Composable ColumnScope.() -> Un
 private fun InfoRow(label: String, value: String) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Text(label, fontSize = 14.sp, color = AppColors.textSecondaryLight)
-        Spacer()
+        Spacer(modifier = Modifier.height(30.dp))
         Text(value, fontSize = 14.sp, fontWeight = FontWeight.Medium, color = AppColors.textPrimaryLight)
     }
 }

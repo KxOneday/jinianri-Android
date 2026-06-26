@@ -1,7 +1,13 @@
 // 纪念日 - 纪念日编辑视图
 // 对应 iOS: CardEditorView.swift
 
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.memorialday.app.ui.detail
+
+import androidx.compose.material3.ExperimentalMaterial3Api
+
+import androidx.compose.material3.ExperimentalMaterial3Api
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -370,7 +376,7 @@ private fun DateSection(
             // 年份
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text("农历年", fontSize = 13.sp, color = AppColors.textSecondaryLight)
-                Spacer()
+                Spacer(modifier = Modifier.weight(1f))
                 // 简化年份输入
                 OutlinedTextField(
                     value = lunarYear.toString(),
@@ -382,7 +388,7 @@ private fun DateSection(
             // 月份
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text("农历月", fontSize = 13.sp, color = AppColors.textSecondaryLight)
-                Spacer()
+                Spacer(modifier = Modifier.weight(1f))
                 OutlinedTextField(
                     value = if (lunarMonth > 0) lunarMonth.toString() else "",
                     onValueChange = { it.toIntOrNull()?.let { m -> onLunarMonthChange(m.coerceIn(1, 12)) } },
@@ -394,7 +400,7 @@ private fun DateSection(
             // 日
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text("农历日", fontSize = 13.sp, color = AppColors.textSecondaryLight)
-                Spacer()
+                Spacer(modifier = Modifier.weight(1f))
                 OutlinedTextField(
                     value = if (lunarDay > 0) lunarDay.toString() else "",
                     onValueChange = { it.toIntOrNull()?.let { d -> onLunarDayChange(d.coerceIn(1, 30)) } },
@@ -406,7 +412,7 @@ private fun DateSection(
             // 闰月
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text("闰月", fontSize = 14.sp, color = AppColors.textPrimaryLight)
-                Spacer()
+                Spacer(modifier = Modifier.weight(1f))
                 Switch(checked = isLeapMonth, onCheckedChange = onLeapMonthChange)
             }
         }
@@ -557,7 +563,7 @@ private fun CardStyleSection(
         // 渐变
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text("渐变底色", fontSize = 15.sp, color = AppColors.textPrimaryLight)
-            Spacer()
+            Spacer(modifier = Modifier.weight(1f))
             Switch(checked = useGradient, onCheckedChange = onUseGradientChange)
         }
 
@@ -644,7 +650,7 @@ private fun ReminderSettingsSection(
     SectionContainer("提醒设置") {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text("启用提醒", fontSize = 15.sp, color = AppColors.textPrimaryLight)
-            Spacer()
+            Spacer(modifier = Modifier.weight(1f))
             Switch(checked = reminderEnabled, onCheckedChange = onReminderEnabledChange)
         }
 
@@ -664,7 +670,7 @@ private fun ReminderSettingsSection(
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text("提醒时间", fontSize = 13.sp, color = AppColors.textSecondaryLight)
-                Spacer()
+                Spacer(modifier = Modifier.weight(1f))
                 OutlinedTextField(
                     value = reminderHour.toString().padStart(2, '0'),
                     onValueChange = { it.toIntOrNull()?.let { h -> onReminderHourChange(h.coerceIn(0, 23)) } },
@@ -695,7 +701,7 @@ private fun ReminderSettingsSection(
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text("每年循环", fontSize = 15.sp, color = AppColors.textPrimaryLight)
-                Spacer()
+                Spacer(modifier = Modifier.weight(1f))
                 Switch(checked = isYearlyRepeat, onCheckedChange = onYearlyRepeatChange)
             }
         }

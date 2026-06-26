@@ -118,7 +118,8 @@ fun TemplatePickerScreen(onDismiss: () -> Unit) {
                     contentPadding = PaddingValues(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    items(templateList) { template ->
+                    items(templateList.size) { index ->
+                        val template = templateList[index]
                         TemplateCard(
                             template = template,
                             onClick = { createdDay = viewModel.createFromTemplate(template) }

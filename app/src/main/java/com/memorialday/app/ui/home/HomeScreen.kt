@@ -142,9 +142,8 @@ fun HomeScreen(modifier: Modifier = Modifier) {
 
             // 浮动按钮
             Box(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.BottomCenter
             ) {
                 FloatingButtons(
                     onTemplates = { showTemplates = true },
@@ -208,11 +207,11 @@ private fun TopBar(
                 )
             }
 
-            Spacer()
+            Spacer(modifier = Modifier.weight(1f))
 
             Text("已选 $selectedCount 项", fontSize = 13.sp, color = AppColors.textSecondaryLight)
 
-            Spacer()
+            Spacer(modifier = Modifier.weight(1f))
 
             TopBarButton(icon = Icons.Filled.Close, onClick = onExitSelect)
 
@@ -233,7 +232,7 @@ private fun TopBar(
                 color = AppColors.textPrimaryLight
             )
 
-            Spacer()
+            Spacer(modifier = Modifier.weight(1f))
 
             TopBarButton(icon = Icons.Filled.Search, onClick = onSearchToggle)
             TopBarButton(icon = Icons.Filled.GridView, onClick = onTemplates)
@@ -399,7 +398,7 @@ private fun UpcomingSection(upcomingDays: List<MemorialDay>) {
             Icon(Icons.Filled.Notifications, null, modifier = Modifier.size(14.dp), tint = AppColors.warning)
             Spacer(modifier = Modifier.width(6.dp))
             Text("即将到期", fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = AppColors.textPrimaryLight)
-            Spacer()
+            Spacer(modifier = Modifier.weight(1f))
             Text("共 ${upcomingDays.size} 项", fontSize = 13.sp, color = AppColors.textSecondaryLight)
         }
 
