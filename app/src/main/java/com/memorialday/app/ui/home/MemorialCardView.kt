@@ -165,7 +165,7 @@ private fun CardContent(
 
     Row(
         modifier = modifier
-            .clip(RoundedCornerShape(day.cornerRadius.dp.toInt()))
+            .clip(RoundedCornerShape(day.cornerRadius.dp))
             .background(
                 if (day.showGradient && day.backgroundEndColorHex != null) {
                     Brush.linearGradient(

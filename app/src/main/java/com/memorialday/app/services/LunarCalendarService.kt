@@ -84,7 +84,6 @@ object LunarCalendarService {
             set(1900, 0, 31, 0, 0, 0)
             set(Calendar.MILLISECOND, 0)
         }
-        var offset = ((cal.timeInMillis - baseCal.timeInMillis) / (1000 * 60 * 60 * 24)).toInt()
 
         // 查找农历年
         var lunarYear = 1900

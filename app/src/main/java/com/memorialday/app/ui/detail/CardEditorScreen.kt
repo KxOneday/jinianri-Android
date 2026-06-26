@@ -274,13 +274,13 @@ private fun PreviewCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(200.dp),
-            shape = RoundedCornerShape(cornerRadius.dp.toInt()),
-            shadowElevation = shadowRadius.dp.toInt().coerceAtMost(8).dp,
+            shape = RoundedCornerShape(cornerRadius.dp),
+            shadowElevation = shadowRadius.dp.coerceAtMost(8.dp),
             color = Color.Transparent
         ) {
             Box(
                 modifier = Modifier
-                    .background(brush = bg, shape = RoundedCornerShape(cornerRadius.dp.toInt())),
+                    .background(brush = bg, shape = RoundedCornerShape(cornerRadius.dp)),
                 contentAlignment = Alignment.Center
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {

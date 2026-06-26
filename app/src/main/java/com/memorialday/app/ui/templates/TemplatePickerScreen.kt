@@ -104,7 +104,7 @@ fun TemplatePickerScreen(onDismiss: () -> Unit) {
             }
 
             // 按分类分组
-            groupedTemplates.forEach { (category, items) ->
+            groupedTemplates.forEach { (category, templateList) ->
                 Spacer(modifier = Modifier.height(20.dp))
                 Text(
                     category,
@@ -118,7 +118,7 @@ fun TemplatePickerScreen(onDismiss: () -> Unit) {
                     contentPadding = PaddingValues(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    items(items) { template ->
+                    items(templateList) { template ->
                         TemplateCard(
                             template = template,
                             onClick = { createdDay = viewModel.createFromTemplate(template) }

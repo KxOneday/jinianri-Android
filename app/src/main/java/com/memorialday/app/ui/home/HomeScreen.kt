@@ -141,11 +141,16 @@ fun HomeScreen(modifier: Modifier = Modifier) {
             }
 
             // 浮动按钮
-            FloatingButtons(
-                onTemplates = { showTemplates = true },
-                onCreateNew = { showNewEditor = true },
-                modifier = Modifier.align(Alignment.BottomCenter)
-            )
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+            ) {
+                FloatingButtons(
+                    onTemplates = { showTemplates = true },
+                    onCreateNew = { showNewEditor = true }
+                )
+            }
         }
     }
 

@@ -25,8 +25,9 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val settingsVM: SettingsViewModel = viewModel()
-            var isUnlocked by remember { mutableStateOf(!settingsVM.requirePassword) }
-            var showLockScreen by remember { mutableStateOf(settingsVM.requirePassword) }
+            val requirePassword by settingsVM.requirePassword.collectAsState()
+            var isUnlocked by remember { mutableStateOf(!requirePassword) }
+            var showLockScreen by remember { mutableStateOf(requirePassword) }
 
             // 对应 iOS: WindowGroup → ContentView
             Surface(
@@ -44,7 +45,7 @@ class MainActivity : ComponentActivity() {
                 } else {
                     MainScreen(
                         onLockRequested = {
-                            if (settingsVM.requirePassword) {
+                            if (requirePassword) {
                                 isUnlocked = false
                                 showLockScreen = true
                             }

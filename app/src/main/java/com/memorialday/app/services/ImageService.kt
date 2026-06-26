@@ -7,7 +7,6 @@ import android.graphics.*
 import android.graphics.Paint.Align
 import com.memorialday.app.models.MemorialDay
 import com.memorialday.app.models.DayType
-import com.memorialday.app.utils.fromHex
 
 /** 海报生成服务 */
 object ImageService {
@@ -18,9 +17,9 @@ object ImageService {
         val canvas = Canvas(bitmap)
 
         // 背景
-        val bgColor = Color.fromHex(day.backgroundColorHex)
+        val bgColor = parseHexColor(day.backgroundColorHex)
         if (day.backgroundEndColorHex != null && day.showGradient) {
-            val endColor = Color.fromHex(day.backgroundEndColorHex!!)
+            val endColor = parseHexColor(day.backgroundEndColorHex!!)
             val gradient = LinearGradient(
                 0f, 0f, width.toFloat(), height.toFloat(),
                 bgColor, endColor, Shader.TileMode.CLAMP
@@ -34,7 +33,7 @@ object ImageService {
         // 半透明遮罩
         canvas.drawColor(Color.argb(38, 255, 255, 255))
 
-        val textColor = Color.fromHex(day.textColorHex)
+        val textColor = parseHexColor(day.textColorHex)
 
         // 绘制天数
         val dayText = "${day.displayDayCount}"
@@ -92,8 +91,8 @@ object ImageService {
         return bitmap
     }
 
-    /** Color 扩展：hex 字符串转 Color Int */
-    private fun Color.fromHex(hex: String): Int {
+    /** 解析十六进制颜色字符串为 Color Int */
+    private fun parseHexColor(hex: String): Int {
         var h = hex.trimStart('#')
         if (h.length == 6) h = "FF$h"
         return try {

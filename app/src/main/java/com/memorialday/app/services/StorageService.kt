@@ -21,7 +21,6 @@ object StorageService {
     var categories: MutableList<Category> = mutableListOf()
         private set
     var settings: AppSettings = AppSettings()
-        private set
 
     fun init(context: Context) {
         appContext = context.applicationContext

@@ -24,7 +24,7 @@ data class ReminderSettings(
         }
 
     /** 计算推送日期 */
-    fun fireDate(from targetDate: Date, isYearlyEvent: Boolean): Date? {
+    fun fireDate(targetDate: Date, isYearlyEvent: Boolean): Date? {
         val calendar = Calendar.getInstance()
         calendar.time = targetDate
         calendar.add(Calendar.DAY_OF_MONTH, -advanceDays)

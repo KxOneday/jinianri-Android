@@ -77,12 +77,14 @@ data class MemorialDay(
 
     /** 显示用的天数字符串 */
     val displayDayCount: Int
-        get() = when (dayType) {
-            DayType.COUNTDOWN -> {
-                if (isYearlyRepeat || daysFromNow <= 0) return daysUntilNextOccurrence
-                kotlin.math.max(daysFromNow, 0)
+        get(): Int {
+            return when (dayType) {
+                DayType.COUNTDOWN -> {
+                    if (isYearlyRepeat || daysFromNow <= 0) return daysUntilNextOccurrence
+                    kotlin.math.max(daysFromNow, 0)
+                }
+                DayType.COUNTUP -> kotlin.math.max(kotlin.math.abs(daysFromNow), 1)
             }
-            DayType.COUNTUP -> kotlin.math.max(kotlin.math.abs(daysFromNow), 1)
         }
 
     /** 计算下次发生距离今天的天数 */

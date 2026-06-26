@@ -159,7 +159,7 @@ fun WorkdayStat(value: String, label: String, color: Color, modifier: Modifier =
 
 /** 快捷换算按钮 */
 @Composable
-fun QuickConvertButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun QuickConvertButton(text: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
     Button(
         onClick = onClick,
         modifier = modifier,

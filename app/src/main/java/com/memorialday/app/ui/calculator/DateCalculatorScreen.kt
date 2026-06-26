@@ -210,7 +210,7 @@ private fun IntervalView(viewModel: DateCalculatorViewModel) {
 
     CardContent("选择日期", Icons.Filled.DateRange, AppColors.primary) {
         DateRow("开始日期", startDate) { viewModel.setStartDate(it) }
-        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+        Divider(modifier = Modifier.padding(vertical = 8.dp))
         DateRow("结束日期", endDate) { viewModel.setEndDate(it) }
     }
 
@@ -249,7 +249,7 @@ private fun IntervalView(viewModel: DateCalculatorViewModel) {
                 Text("天", fontSize = 22.sp, fontWeight = FontWeight.Medium, color = AppColors.textSecondaryLight)
             }
             Text(result.directionText, fontSize = 14.sp, color = AppColors.textSecondaryLight)
-            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+            Divider(modifier = Modifier.padding(vertical = 8.dp))
             DetailRow("间隔", "${result.totalDays} 天")
             DetailRow("折合", "${result.years}年 ${result.months}月 ${result.days}天")
             DetailRow("折合周", "${result.weeks}周 ${result.weekRemainingDays}天")
@@ -284,7 +284,7 @@ private fun DateCalcView(viewModel: DateCalculatorViewModel) {
                 com.memorialday.app.ui.components.FilterChip("过去", null, !calcDirection) { viewModel.setCalcDirection(false) }
             }
         }
-        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+        Divider(modifier = Modifier.padding(vertical = 8.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text("数量", fontSize = 13.sp, color = AppColors.textSecondaryLight)
             Spacer()
@@ -437,7 +437,7 @@ private fun WorkdayView(viewModel: DateCalculatorViewModel) {
 
     CardContent("选择日期范围", Icons.Filled.Work, AppColors.success) {
         DateRow("开始日期", workStartDate) { viewModel.setWorkStartDate(it) }
-        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+        Divider(modifier = Modifier.padding(vertical = 8.dp))
         DateRow("结束日期", workEndDate) { viewModel.setWorkEndDate(it) }
     }
 
