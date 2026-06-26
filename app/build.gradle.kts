@@ -36,6 +36,12 @@ android {
         compose = true
     }
 
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
+
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.10"
     }
@@ -75,9 +81,6 @@ dependencies {
 
     // WorkManager (for notifications/alarms)
     implementation("androidx.work:work-runtime-ktx:2.9.0")
-
-    // Glide Compose (image loading)
-    implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
 
     debugImplementation("androidx.compose.ui:ui-tooling")
 }
