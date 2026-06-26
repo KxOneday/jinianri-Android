@@ -7,6 +7,7 @@ package com.memorialday.app.ui.detail
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 
+import android.view.ContextThemeWrapper
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -442,8 +443,9 @@ private fun DatePickerDialog(selectedDate: Date, onDateSelected: (Date) -> Unit)
     cal.time = selectedDate
 
     TextButton(onClick = {
-        android.app.DatePickerDialog(
-            context,
+        val styledContext = ContextThemeWrapper(context, android.R.style.Theme_DeviceDefault_Light_Dialog_Alert)
+        val dialog = android.app.DatePickerDialog(
+            styledContext,
             { _, year, month, day ->
                 onDateSelected(Date(Calendar.getInstance().apply {
                     set(year, month, day, 0, 0, 0)
@@ -453,9 +455,14 @@ private fun DatePickerDialog(selectedDate: Date, onDateSelected: (Date) -> Unit)
             cal.get(Calendar.YEAR),
             cal.get(Calendar.MONTH),
             cal.get(Calendar.DAY_OF_MONTH)
-        ).apply {
-            datePicker.calendarViewShown = false
-        }.show()
+        )
+        // 强制使用滚轮模式（API 21+）
+        try {
+            val dp = dialog.datePicker
+            dp.javaClass.getMethod("setCalendarViewShown", Boolean::class.java).invoke(dp, false)
+            dp.javaClass.getMethod("setMode", Int::class.java).invoke(dp, 1) // 1 = MODE_SPINNER
+        } catch (_: Exception) {}
+        dialog.show()
     }) {
         val fmt = SimpleDateFormat("yyyy年M月d日", Locale.CHINESE)
         Text(fmt.format(selectedDate), color = AppColors.primary)
@@ -670,14 +677,20 @@ private fun ReminderSettingsSection(
             Spacer(modifier = Modifier.height(4.dp))
             val context = LocalContext.current
             TextButton(onClick = {
+                val styledContext = ContextThemeWrapper(context, android.R.style.Theme_DeviceDefault_Light_Dialog_Alert)
                 android.app.TimePickerDialog(
-                    context,
+                    styledContext,
                     { _, hour, minute ->
                         onReminderHourChange(hour)
                         onReminderMinuteChange(minute)
                     },
                     reminderHour, reminderMinute, true
-                ).show()
+                ).apply {
+                    try {
+                        // 强制滚轮模式（API 22+）
+                        timePicker.javaClass.getMethod("setMode", Int::class.java).invoke(timePicker, 1)
+                    } catch (_: Exception) {}
+                }.show()
             }) {
                 Text(
                     "${reminderHour.toString().padStart(2, '0')}:${reminderMinute.toString().padStart(2, '0')}",
