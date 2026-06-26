@@ -22,6 +22,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -675,27 +676,38 @@ private fun ReminderSettingsSection(
 
             Text("提醒时间", fontSize = 13.sp, color = AppColors.textSecondaryLight)
             Spacer(modifier = Modifier.height(4.dp))
-            val context = LocalContext.current
-            TextButton(onClick = {
-                val styledContext = ContextThemeWrapper(context, android.R.style.Theme_DeviceDefault_Light_Dialog_Alert)
-                android.app.TimePickerDialog(
-                    styledContext,
-                    { _, hour, minute ->
-                        onReminderHourChange(hour)
-                        onReminderMinuteChange(minute)
-                    },
-                    reminderHour, reminderMinute, true
-                ).apply {
-                    try {
-                        // 强制滚轮模式（API 22+）
-                        timePicker.javaClass.getMethod("setMode", Int::class.java).invoke(timePicker, 1)
-                    } catch (_: Exception) {}
-                }.show()
-            }) {
+            var showTimePicker by remember { mutableStateOf(false) }
+            val timePicker = remember {
+                android.widget.TimePicker(ContextThemeWrapper(context, android.R.style.Theme_DeviceDefault_Light_Dialog_Alert)).apply {
+                    setIs24HourView(java.lang.Boolean.TRUE)
+                    currentHour = reminderHour
+                    currentMinute = reminderMinute
+                    try { javaClass.getMethod("setMode", Int::class.java).invoke(this, 1) } catch (_: Exception) {}
+                }
+            }
+            TextButton(onClick = { showTimePicker = true }) {
                 Text(
                     "${reminderHour.toString().padStart(2, '0')}:${reminderMinute.toString().padStart(2, '0')}",
                     fontSize = 20.sp,
                     color = AppColors.primary
+                )
+            }
+
+            if (showTimePicker) {
+                AlertDialog(
+                    onDismissRequest = { showTimePicker = false },
+                    title = { Text("选择时间") },
+                    text = { AndroidView(factory = { timePicker }) },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            onReminderHourChange(timePicker.currentHour)
+                            onReminderMinuteChange(timePicker.currentMinute)
+                            showTimePicker = false
+                        }) { Text("确定") }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showTimePicker = false }) { Text("取消") }
+                    }
                 )
             }
 
