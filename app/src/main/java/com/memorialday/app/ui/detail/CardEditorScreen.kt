@@ -623,26 +623,34 @@ private fun CardStyleSection(
         // 背景颜色
         Text("背景颜色", fontSize = 13.sp, fontWeight = FontWeight.Medium, color = AppColors.textSecondaryLight)
         Row(verticalAlignment = Alignment.CenterVertically) {
+            var showColorPicker by remember { mutableStateOf(false) }
             Box(
                 modifier = Modifier
                     .size(36.dp)
                     .clip(RoundedCornerShape(8.dp))
                     .background(Color.fromHex(bgColorHex))
+                    .clickable { showColorPicker = true }
             )
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(8.dp))
+            TextButton(onClick = { showColorPicker = true }) {
+                Text("色板", fontSize = 13.sp, color = AppColors.accent)
+            }
+            Spacer(modifier = Modifier.width(4.dp))
             OutlinedTextField(
                 value = bgColorHex,
                 onValueChange = onBgColorChange,
                 modifier = Modifier.width(100.dp),
                 singleLine = true
             )
+            if (showColorPicker) {
+                AlertDialog(
+                    onDismissRequest = { showColorPicker = false },
+                    title = { Text("选择颜色") },
+                    text = { ColorSpectrumPicker(currentColor = bgColorHex, onColorSelected = { onBgColorChange(it); showColorPicker = false }) },
+                    confirmButton = { TextButton(onClick = { showColorPicker = false }) { Text("确定") } }
+                )
+            }
         }
-        // 背景色光谱
-        Spacer(modifier = Modifier.height(6.dp))
-        ColorSpectrumPicker(
-            currentColor = bgColorHex,
-            onColorSelected = onBgColorChange
-        )
 
         Spacer(modifier = Modifier.height(12.dp))
 
@@ -672,10 +680,33 @@ private fun CardStyleSection(
                 )
             }
             Spacer(modifier = Modifier.height(6.dp))
-            ColorSpectrumPicker(
-                currentColor = bgEndColorHex.ifEmpty { "#F5F0EB" },
-                onColorSelected = onBgEndColorChange
-            )
+            var showGradPicker by remember { mutableStateOf(false) }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier.size(36.dp).clip(RoundedCornerShape(8.dp))
+                        .background(Color.fromHex(bgEndColorHex.ifEmpty { bgColorHex }))
+                        .clickable { showGradPicker = true }
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                TextButton(onClick = { showGradPicker = true }) {
+                    Text("色板", fontSize = 13.sp, color = AppColors.accent)
+                }
+                Spacer(modifier = Modifier.width(4.dp))
+                OutlinedTextField(
+                    value = bgEndColorHex,
+                    onValueChange = onBgEndColorChange,
+                    modifier = Modifier.width(100.dp),
+                    singleLine = true
+                )
+            }
+            if (showGradPicker) {
+                AlertDialog(
+                    onDismissRequest = { showGradPicker = false },
+                    title = { Text("选择渐变颜色") },
+                    text = { ColorSpectrumPicker(currentColor = bgEndColorHex.ifEmpty { bgColorHex }, onColorSelected = { onBgEndColorChange(it); showGradPicker = false }) },
+                    confirmButton = { TextButton(onClick = { showGradPicker = false }) { Text("确定") } }
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -683,26 +714,32 @@ private fun CardStyleSection(
         // 文字颜色
         Text("文字颜色", fontSize = 13.sp, fontWeight = FontWeight.Medium, color = AppColors.textSecondaryLight)
         Row(verticalAlignment = Alignment.CenterVertically) {
+            var showTextPicker by remember { mutableStateOf(false) }
             Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(RoundedCornerShape(8.dp))
+                modifier = Modifier.size(36.dp).clip(RoundedCornerShape(8.dp))
                     .background(Color.fromHex(textColorHex))
+                    .clickable { showTextPicker = true }
             )
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(8.dp))
+            TextButton(onClick = { showTextPicker = true }) {
+                Text("色板", fontSize = 13.sp, color = AppColors.accent)
+            }
+            Spacer(modifier = Modifier.width(4.dp))
             OutlinedTextField(
                 value = textColorHex,
                 onValueChange = onTextColorChange,
                 modifier = Modifier.width(100.dp),
                 singleLine = true
             )
+            if (showTextPicker) {
+                AlertDialog(
+                    onDismissRequest = { showTextPicker = false },
+                    title = { Text("选择文字颜色") },
+                    text = { ColorSpectrumPicker(currentColor = textColorHex, onColorSelected = { onTextColorChange(it); showTextPicker = false }) },
+                    confirmButton = { TextButton(onClick = { showTextPicker = false }) { Text("确定") } }
+                )
+            }
         }
-        // 文字颜色光谱
-        Spacer(modifier = Modifier.height(6.dp))
-        ColorSpectrumPicker(
-            currentColor = textColorHex,
-            onColorSelected = onTextColorChange
-        )
 
         Spacer(modifier = Modifier.height(12.dp))
 

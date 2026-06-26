@@ -35,11 +35,11 @@ import com.memorialday.app.viewmodels.MemorialDayViewModel
 @Composable
 fun CardDetailScreen(
     day: MemorialDay,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    onEdit: (MemorialDay) -> Unit = {}
 ) {
     val viewModel = remember { MemorialDayViewModel.getInstance() }
     var currentDay by remember { mutableStateOf(day) }
-    var showEditor by remember { mutableStateOf(false) }
     var showDeleteAlert by remember { mutableStateOf(false) }
 
     // 从 ViewModel 刷新最新数据
@@ -67,10 +67,6 @@ fun CardDetailScreen(
         )
     }
 
-    if (showEditor) {
-        CardEditorScreen(editDay = currentDay, onDismiss = { showEditor = false })
-    }
-
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         Scaffold(
             topBar = {
@@ -78,7 +74,7 @@ fun CardDetailScreen(
                     title = { Text("详情", fontSize = 17.sp, fontWeight = FontWeight.SemiBold) },
                     navigationIcon = { IconButton(onClick = onDismiss) { Icon(Icons.Filled.Close, null) } },
                     actions = {
-                        TextButton(onClick = { showEditor = true }) {
+                        TextButton(onClick = { onEdit(currentDay) }) {
                             Text("编辑", color = AppColors.accent, fontSize = 15.sp, fontWeight = FontWeight.Medium)
                         }
                     },

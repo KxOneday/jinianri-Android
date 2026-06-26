@@ -53,6 +53,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
     var showSearch by remember { mutableStateOf(false) }
     var showTemplates by remember { mutableStateOf(false) }
     var selectedDayForDetail by remember { mutableStateOf<MemorialDay?>(null) }
+    var selectedDayForEdit by remember { mutableStateOf<MemorialDay?>(null) }
     var isSelectMode by remember { mutableStateOf(false) }
     var searchText by remember { mutableStateOf("") }
 
@@ -164,7 +165,11 @@ fun HomeScreen(modifier: Modifier = Modifier) {
         TemplatePickerScreen(onDismiss = { showTemplates = false })
     }
     selectedDayForDetail?.let { day ->
-        CardDetailScreen(day = day, onDismiss = { selectedDayForDetail = null })
+        CardDetailScreen(day = day, onDismiss = { selectedDayForDetail = null },
+            onEdit = { selectedDayForEdit = it; selectedDayForDetail = null })
+    }
+    selectedDayForEdit?.let { day ->
+        CardEditorScreen(editDay = day, onDismiss = { selectedDayForEdit = null })
     }
 }
 
