@@ -41,7 +41,7 @@
         <!-- 开机启动接收器（用于重新调度提醒） -->
         <receiver
             android:name=".services.BootReceiver"
-            android:exported="false">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>

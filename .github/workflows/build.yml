@@ -43,6 +43,12 @@ jobs:
       - name: 🔑 授予 gradlew 执行权限
         run: chmod +x ./gradlew
 
+      # ---------- 4b. 接受 SDK 许可并安装平台 ----------
+      - name: 🤖 接受 SDK 许可
+        run: |
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null 2>&1 || true
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-34" > /dev/null 2>&1 || true
+
       # ---------- 5. 缓存 Gradle ----------
       - name: 💾 缓存 Gradle
         uses: actions/cache@v4
