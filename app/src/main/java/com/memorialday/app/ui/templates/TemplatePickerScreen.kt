@@ -6,13 +6,7 @@ package com.memorialday.app.ui.templates
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -21,7 +15,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -62,79 +55,97 @@ fun TemplatePickerScreen(onDismiss: () -> Unit) {
             )
         }
     ) { padding ->
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
                 .background(AppColors.backgroundLight)
-                .verticalScroll(rememberScrollState())
                 .padding(vertical = 16.dp)
         ) {
             // 顶部说明
-            Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-                Text(
-                    "选择模板快速创建",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = AppColors.textPrimaryLight
-                )
-                Spacer(modifier = Modifier.height(6.dp))
-                Text(
-                    "选择一个模板，快速创建纪念日后再调整细节",
-                    fontSize = 14.sp,
-                    color = AppColors.textSecondaryLight
-                )
+            item {
+                Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                    Text(
+                        "选择模板快速创建",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = AppColors.textPrimaryLight
+                    )
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Text(
+                        "选择一个模板，快速创建纪念日后再调整细节",
+                        fontSize = 14.sp,
+                        color = AppColors.textSecondaryLight
+                    )
+                }
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            item { Spacer(modifier = Modifier.height(20.dp)) }
 
-            // 全部模板（网格）
-            LazyVerticalGrid(
-                columns = GridCells.Adaptive(minSize = 160.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.padding(horizontal = 16.dp)
-            ) {
-                items(templates) { template ->
-                    TemplateCard(
-                        template = template,
-                        onClick = { createdDay = viewModel.createFromTemplate(template) }
-                    )
+            // 全部模板（网格）- 用 Column 替代 LazyVerticalGrid 避免嵌套滚动
+            item {
+                Column(
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                ) {
+                    val rows = templates.chunked(2)
+                    rows.forEach { rowItems ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            rowItems.forEach { template ->
+                                TemplateCard(
+                                    template = template,
+                                    onClick = { createdDay = viewModel.createFromTemplate(template) },
+                                    modifier = Modifier.weight(1f)
+                                )
+                            }
+                            if (rowItems.size < 2) {
+                                Spacer(modifier = Modifier.weight(1f))
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(12.dp))
+                    }
                 }
             }
 
             // 按分类分组
             groupedTemplates.forEach { (category, templateList) ->
-                Spacer(modifier = Modifier.height(20.dp))
-                Text(
-                    category,
-                    fontSize = 17.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = AppColors.textPrimaryLight,
-                    modifier = Modifier.padding(horizontal = 16.dp)
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                LazyRow(
-                    contentPadding = PaddingValues(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    items(templateList.size) { index ->
-                        val template = templateList[index]
-                        TemplateCard(
-                            template = template,
-                            onClick = { createdDay = viewModel.createFromTemplate(template) }
-                        )
+                item { Spacer(modifier = Modifier.height(20.dp)) }
+                item {
+                    Text(
+                        category,
+                        fontSize = 17.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = AppColors.textPrimaryLight,
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+                }
+                item { Spacer(modifier = Modifier.height(10.dp)) }
+                item {
+                    LazyRow(
+                        contentPadding = PaddingValues(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        items(templateList.size) { index ->
+                            val template = templateList[index]
+                            TemplateCard(
+                                template = template,
+                                onClick = { createdDay = viewModel.createFromTemplate(template) },
+                                modifier = Modifier.width(150.dp)
+                            )
+                        }
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(40.dp))
+            item { Spacer(modifier = Modifier.height(40.dp)) }
         }
     }
 }
 
 @Composable
-private fun TemplateCard(template: MemorialTemplate, onClick: () -> Unit) {
+private fun TemplateCard(template: MemorialTemplate, onClick: () -> Unit, modifier: Modifier = Modifier) {
     val cardColor = when (template.categoryName) {
         "生日" -> Color.fromHex("#FF6B6B")
         "恋爱" -> Color.fromHex("#FF69B4")
@@ -165,8 +176,7 @@ private fun TemplateCard(template: MemorialTemplate, onClick: () -> Unit) {
     }
 
     Surface(
-        modifier = Modifier
-            .width(150.dp)
+        modifier = modifier
             .height(100.dp)
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(16.dp),
