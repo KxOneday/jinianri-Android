@@ -151,8 +151,10 @@ object LunarCalendarService {
     /** 当年农历总天数 */
     private fun lunarYearDays(y: Int): Int {
         var sum = 348 // 12个月 * 29天
-        for (i in 0x8000; i > 0x8; i = i shr 1) {
+        var i = 0x8000
+        while (i > 0x8) {
             if ((lunarInfo[y - 1900] and i) != 0) sum++
+            i = i shr 1
         }
         return sum + lunarLeapDays(y)
     }

@@ -436,7 +436,6 @@ private fun DateSection(
 @Composable
 // MARK: - 日期选择器（滚轮样式）
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DatePickerDialog(selectedDate: Date, onDateSelected: (Date) -> Unit) {
     val context = LocalContext.current
@@ -685,9 +684,6 @@ private fun ReminderSettingsSection(
                     "${reminderHour.toString().padStart(2, '0')}:${reminderMinute.toString().padStart(2, '0')}",
                     fontSize = 20.sp,
                     color = AppColors.primary
-                )
-            }
-                    singleLine = true
                 )
             }
 
