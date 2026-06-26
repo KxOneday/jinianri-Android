@@ -6,8 +6,6 @@
 package com.memorialday.app.ui.detail
 
 import androidx.compose.material3.ExperimentalMaterial3Api
-
-import android.view.ContextThemeWrapper
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -127,7 +125,7 @@ fun CardEditorScreen(
                 .background(AppColors.backgroundLight)
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 16.dp)
-                .padding(bottom = 40.dp),
+                .padding(bottom = 100.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // 预览卡片
@@ -751,41 +749,30 @@ private fun ReminderSettingsSection(
 
             Text("提醒时间", fontSize = 13.sp, color = AppColors.textSecondaryLight)
             Spacer(modifier = Modifier.height(4.dp))
-            var showTimePicker by remember { mutableStateOf(false) }
-            val context = LocalContext.current
-            val timePicker = remember {
-                android.widget.TimePicker(context).apply {
-                    setIs24HourView(java.lang.Boolean.TRUE)
-                    currentHour = reminderHour
-                    currentMinute = reminderMinute
-                    try {
-                        javaClass.getMethod("setMode", Int::class.java).invoke(this, 1)
-                    } catch (_: Exception) {}
-                }
-            }
-            TextButton(onClick = { showTimePicker = true }) {
-                Text(
-                    "${reminderHour.toString().padStart(2, '0')}:${reminderMinute.toString().padStart(2, '0')}",
-                    fontSize = 20.sp,
-                    color = AppColors.primary
-                )
-            }
-
-            if (showTimePicker) {
-                AlertDialog(
-                    onDismissRequest = { showTimePicker = false },
-                    title = { Text("选择时间") },
-                    text = { AndroidView(factory = { timePicker }) },
-                    confirmButton = {
-                        TextButton(onClick = {
-                            onReminderHourChange(timePicker.currentHour)
-                            onReminderMinuteChange(timePicker.currentMinute)
-                            showTimePicker = false
-                        }) { Text("确定") }
+            // 时分滚轮：inline NumberPicker
+            Row(modifier = Modifier.fillMaxWidth()) {
+                AndroidView(
+                    modifier = Modifier.weight(1f).height(160.dp),
+                    factory = { ctx ->
+                        android.widget.NumberPicker(ctx).apply {
+                            minValue = 0; maxValue = 23; value = reminderHour
+                            setOnValueChangedListener { _, _, newVal -> onReminderHourChange(newVal) }
+                            descendantFocusability = android.view.ViewGroup.FOCUS_BLOCK_DESCENDANTS
+                        }
                     },
-                    dismissButton = {
-                        TextButton(onClick = { showTimePicker = false }) { Text("取消") }
-                    }
+                    update = { picker -> picker.value = reminderHour }
+                )
+                AndroidView(
+                    modifier = Modifier.weight(1f).height(160.dp),
+                    factory = { ctx ->
+                        android.widget.NumberPicker(ctx).apply {
+                            minValue = 0; maxValue = 59; value = reminderMinute
+                            setDisplayedValues(Array(60) { it.toString().padStart(2, '0') })
+                            setOnValueChangedListener { _, _, newVal -> onReminderMinuteChange(newVal) }
+                            descendantFocusability = android.view.ViewGroup.FOCUS_BLOCK_DESCENDANTS
+                        }
+                    },
+                    update = { picker -> picker.value = reminderMinute }
                 )
             }
 
