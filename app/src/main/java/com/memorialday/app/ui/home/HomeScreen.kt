@@ -466,7 +466,7 @@ private fun FloatingButtons(
             Icon(Icons.Filled.GridView, null, modifier = Modifier.size(18.dp), tint = Color.White)
         }
 
-        Spacer()
+        Spacer(modifier = Modifier.weight(1f))
 
         // 新建按钮
         FloatingActionButton(
