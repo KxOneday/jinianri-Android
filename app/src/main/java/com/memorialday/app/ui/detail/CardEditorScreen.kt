@@ -816,96 +816,46 @@ private fun ReminderSettingsSection(
     }
 }
 
-// MARK: - 颜色光谱选择器
+// MARK: - 颜色光谱网格
+
+private val colorGrid = listOf(
+    "#FFFFFF","#F5F0EB","#FAF0E6","#FFF5EE","#FFE4E1","#FFDAB9","#FFC0CB","#FFB6C1",
+    "#E8F5E9","#C8E6C9","#A5D6A7","#81C784","#BBDEFB","#90CAF9","#64B5F6","#42A5F5",
+    "#FFF8E1","#FFECB3","#FFE082","#FFD54F","#F3E5F5","#E1BEE7","#CE93D8","#BA68C8",
+    "#FFEBEE","#FFCDD2","#EF9A9A","#E57373","#FFF3E0","#FFE0B2","#FFCC80","#FFB74D",
+    "#E0F2F1","#B2DFDB","#80CBC4","#4DB6AC","#ECEFF1","#CFD8DC","#B0BEC5","#90A4AE",
+    "#2C2C2C","#333333","#555555","#777777","#999999","#BBBBBB","#DDDDDD","#EEEEEE"
+)
 
 @Composable
 private fun ColorSpectrumPicker(
     currentColor: String,
     onColorSelected: (String) -> Unit
 ) {
-    var hue by remember { mutableStateOf(colorToHue(currentColor)) }
-    var saturation by remember { mutableStateOf(colorToSaturation(currentColor)) }
-    var lightness by remember { mutableStateOf(colorToLightness(currentColor)) }
-
-    val currentColorState = remember { mutableStateOf(Color.fromHex(currentColor)) }
-
-    fun updateColor() {
-        val col = Color.hsl(hue, saturation / 100f, lightness / 100f)
-        currentColorState.value = col
-        onColorSelected(col.toHex())
+    val chunks = colorGrid.chunked(8)
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        chunks.forEach { row ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                row.forEach { hex ->
+                    val isSelected = hex.equals(currentColor, ignoreCase = true)
+                    Box(
+                        modifier = Modifier
+                            .size(32.dp)
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(Color.fromHex(hex))
+                            .then(
+                                if (isSelected) Modifier.border(2.dp, AppColors.accent, RoundedCornerShape(4.dp))
+                                else Modifier.border(0.5.dp, Color.LightGray, RoundedCornerShape(4.dp))
+                            )
+                            .clickable { onColorSelected(hex) }
+                    )
+                }
+            }
+        }
     }
-
-    Column {
-        // 当前颜色预览
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(40.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(currentColorState.value)
-                .border(1.dp, Color.LightGray, RoundedCornerShape(8.dp))
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // 色相滑块 (Hue 0-360)
-        Text("色相", fontSize = 11.sp, color = AppColors.textSecondaryLight)
-        Slider(
-            value = hue,
-            onValueChange = { hue = it; updateColor() },
-            valueRange = 0f..360f,
-            colors = SliderDefaults.colors(thumbColor = AppColors.accent, activeTrackColor = AppColors.accent)
-        )
-
-        // 饱和度滑块 (Saturation 0-100)
-        Text("饱和度", fontSize = 11.sp, color = AppColors.textSecondaryLight)
-        Slider(
-            value = saturation,
-            onValueChange = { saturation = it; updateColor() },
-            valueRange = 0f..100f,
-            colors = SliderDefaults.colors(thumbColor = AppColors.accent, activeTrackColor = AppColors.accent)
-        )
-
-        // 亮度滑块 (Lightness 0-100)
-        Text("亮度", fontSize = 11.sp, color = AppColors.textSecondaryLight)
-        Slider(
-            value = lightness,
-            onValueChange = { lightness = it; updateColor() },
-            valueRange = 0f..100f,
-            colors = SliderDefaults.colors(thumbColor = AppColors.accent, activeTrackColor = AppColors.accent)
-        )
-
-        // 当前 Hex 值
-        Text(
-            currentColorState.value.toHex(),
-            fontSize = 13.sp,
-            color = AppColors.textSecondaryLight
-        )
-    }
-}
-
-private fun colorToHue(hex: String): Float {
-    val colorInt = android.graphics.Color.parseColor(hex)
-    val outHsv = FloatArray(3)
-    android.graphics.Color.colorToHSV(colorInt, outHsv)
-    return outHsv[0]
-}
-
-private fun colorToSaturation(hex: String): Float {
-    val colorInt = android.graphics.Color.parseColor(hex)
-    val outHsv = FloatArray(3)
-    android.graphics.Color.colorToHSV(colorInt, outHsv)
-    return outHsv[1] * 100f
-}
-
-private fun colorToLightness(hex: String): Float {
-    val colorInt = android.graphics.Color.parseColor(hex)
-    val r = android.graphics.Color.red(colorInt)
-    val g = android.graphics.Color.green(colorInt)
-    val b = android.graphics.Color.blue(colorInt)
-    val max = maxOf(r, g, b)
-    val min = minOf(r, g, b)
-    return ((max + min) / 2f / 255f * 100f)
 }
 
 // MARK: - Section 容器
