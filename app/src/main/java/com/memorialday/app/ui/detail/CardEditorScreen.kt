@@ -67,7 +67,8 @@ fun CardEditorScreen(
     var useGradient by remember { mutableStateOf(editDay?.showGradient ?: false) }
     var fontSize by remember { mutableStateOf(editDay?.fontSize ?: 28.0) }
     var cornerRadius by remember { mutableStateOf(editDay?.cornerRadius ?: 16.0) }
-    var shadowRadius by remember { mutableStateOf(editDay?.shadowRadius ?: 8.0) }
+    var shadowRadius by remember { mutableStateOf(editDay?.shadowRadius ?: 8.0) }  // 默认阴影强度改为8
+    var selectedIcon by remember { mutableStateOf("favorite") }
 
     // 提醒设置
     var reminderEnabled by remember { mutableStateOf(editDay?.reminderSettings?.isEnabled ?: false) }
@@ -723,9 +724,9 @@ private fun CardStyleSection(
             "favorite" to Icons.Filled.Favorite, "star" to Icons.Filled.Star,
             "card_giftcard" to Icons.Filled.CardGiftcard, "auto_awesome" to Icons.Filled.AutoAwesome,
             "local_fire_department" to Icons.Filled.LocalFireDepartment, "dark_mode" to Icons.Filled.DarkMode,
-            "light_mode" to Icons.Filled.LightMode, "balloon" to Icons.Filled.Balloon,
-            "crown" to Icons.Filled.Crown, "auto_awesome_mosaic" to Icons.Filled.AutoAwesomeMosaic,
-            "celebration" to Icons.Filled.Celebration, "celebration_outlined" to Icons.Filled.Celebration,
+            "light_mode" to Icons.Filled.LightMode, "balloon" to Icons.Filled.Circle,
+            "crown" to Icons.Filled.Star, "auto_awesome_mosaic" to Icons.Filled.GridView,
+            "celebration" to Icons.Filled.Celebration, "celebration" to Icons.Filled.Celebration,
             "menu_book" to Icons.Filled.MenuBook, "work" to Icons.Filled.Work,
             "flight" to Icons.Filled.Flight, "notifications" to Icons.Filled.Notifications
         )
