@@ -6,7 +6,7 @@ package com.memorialday.app.ui
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -29,7 +29,7 @@ fun MainScreen(onLockRequested: () -> Unit = {}) {
 
     val tabs = listOf(
         TabItem("首页", Icons.Filled.Home),
-        TabItem("时间计算器", Icons.Filled.CalendarMonth),
+        TabItem("时间计算器", Icons.Filled.History),
         TabItem("设置", Icons.Filled.Settings)
     )
 
