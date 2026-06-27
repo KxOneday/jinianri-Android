@@ -49,7 +49,7 @@ fun MemorialCardView(
 
     // 使用 dp 作为滑动偏移单位
     val swipeOffsetDp by animateDpAsState(
-        targetValue = if (swipeActionsShown) 150.dp else 0.dp,
+        targetValue = if (swipeActionsShown) 170.dp else 0.dp,
         animationSpec = spring(dampingRatio = 0.6f, stiffness = 200f)
     )
 
