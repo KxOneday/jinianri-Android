@@ -26,6 +26,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.memorialday.app.models.MemorialDay
 import com.memorialday.app.ui.detail.CardDetailScreen
 import com.memorialday.app.ui.theme.AppColors
 import com.memorialday.app.utils.fromHex
@@ -45,8 +46,6 @@ fun MemorialCardView(
 
     val selectedDays by viewModel.selectedDays.collectAsState()
     val isSelected = selectedDays.contains(day.id)
-
-    var swipeActionsShown by remember { mutableStateOf(false) }
 
     // 使用 dp 作为滑动偏移单位
     val swipeOffsetDp by animateDpAsState(
