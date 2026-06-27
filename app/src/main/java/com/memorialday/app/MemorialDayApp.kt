@@ -7,6 +7,7 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Build
+import com.memorialday.app.mooncalendar.MoonCalendarStorage
 import com.memorialday.app.services.NotificationService
 import com.memorialday.app.services.StorageService
 
@@ -19,6 +20,7 @@ class MemorialDayApp : Application() {
         // 初始化核心服务（对应 iOS AppDelegate）
         createNotificationChannels()
         StorageService.init(this)
+        MoonCalendarStorage.init(this)
     }
 
     private fun createNotificationChannels() {
