@@ -146,7 +146,7 @@ private fun StatusCard(phase: PeriodPhase, daysUntilNext: Int, dayInCycle: Int, 
                     Text("🩸 姨妈来啦第 ${dayInCycle + 1} 天，加油～", fontSize = 14.sp, color = Color.Gray)
                     Spacer(modifier = Modifier.height(4.dp))
                     Text("${daysUntilNext}", fontSize = 48.sp, fontWeight = FontWeight.Bold, color = Pink)
-                    RichText("天")
+                    Text("天", fontSize = 18.sp, color = Color.Gray)
                 }
                 PeriodPhase.FERTILE -> {
                     Text("🌱 易孕期，注意哦", fontSize = 14.sp, color = Color.Gray)
