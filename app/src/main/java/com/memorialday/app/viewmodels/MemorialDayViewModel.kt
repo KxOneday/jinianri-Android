@@ -99,6 +99,8 @@ class MemorialDayViewModel : ViewModel() {
         NotificationService.scheduleNotification(day, MemorialDayApp.instance)
         loadData()
         refreshDisplay()
+        // 强制刷新：拷贝列表触发 StateFlow 发射新值
+        _days.value = _days.value.toList()
     }
 
     fun updateDay(day: MemorialDay) {
