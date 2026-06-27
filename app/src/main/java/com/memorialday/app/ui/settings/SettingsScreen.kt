@@ -14,6 +14,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -58,7 +59,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                         }
                         settingsVM.setRequirePassword(it)
                     },
-                    colors = SwitchDefaults.colors(checkedThumbColor = AppColors.accent)
+                    colors = SwitchDefaults.colors(checkedThumbColor = AppColors.accent, checkedTrackColor = AppColors.accent.copy(alpha = 0.3f))
                 )
             }
 
@@ -81,7 +82,7 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                 Switch(
                     checked = notificationsEnabled,
                     onCheckedChange = { settingsVM.setNotificationsEnabled(it) },
-                    colors = SwitchDefaults.colors(checkedThumbColor = AppColors.accent)
+                    colors = SwitchDefaults.colors(checkedThumbColor = AppColors.accent, checkedTrackColor = AppColors.accent.copy(alpha = 0.3f))
                 )
             }
 
@@ -109,10 +110,17 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                 Spacer(modifier = Modifier.width(4.dp))
                 Text("AES-256 本地加密", fontSize = 12.sp, color = AppColors.success)
             }
+            val uriHandler = LocalUriHandler.current
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text("作者", fontSize = 14.sp, color = AppColors.textSecondaryLight)
                 Spacer(modifier = Modifier.weight(1f))
-                Text("Felix.", fontSize = 14.sp, color = AppColors.primary)
+                Text(
+                    text = "Felix.",
+                    color = AppColors.primary,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.clickable { uriHandler.openUri("https://qm.qq.com/q/ChoCt1Fr3M") }
+                )
             }
         }
 

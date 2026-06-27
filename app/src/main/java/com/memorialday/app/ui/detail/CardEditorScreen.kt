@@ -529,7 +529,8 @@ private fun DateSection(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text("闰月", fontSize = 14.sp, color = AppColors.textPrimaryLight)
                     Spacer(modifier = Modifier.weight(1f))
-                    Switch(checked = isLeapMonth, onCheckedChange = onLeapMonthChange)
+                    Switch(checked = isLeapMonth, onCheckedChange = onLeapMonthChange,
+                        colors = SwitchDefaults.colors(checkedThumbColor = AppColors.accent, checkedTrackColor = AppColors.accent.copy(alpha = 0.3f)))
                 }
                 // 农历预览：显示对应公历
                 if (lunarMonth >= 1 && lunarDay >= 1) {
@@ -567,7 +568,8 @@ private fun DateSection(
                 }
                 Switch(
                     checked = useLunarCalendar,
-                    onCheckedChange = { onUseLunarChange(it) }
+                    onCheckedChange = { onUseLunarChange(it) },
+                    colors = SwitchDefaults.colors(checkedThumbColor = AppColors.accent, checkedTrackColor = AppColors.accent.copy(alpha = 0.3f))
                 )
             }
         }
@@ -787,7 +789,8 @@ private fun ReminderSettingsSection(
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text("启用提醒", fontSize = 15.sp, color = AppColors.textPrimaryLight)
             Spacer(modifier = Modifier.weight(1f))
-            Switch(checked = reminderEnabled, onCheckedChange = onReminderEnabledChange)
+            Switch(checked = reminderEnabled, onCheckedChange = onReminderEnabledChange,
+                colors = SwitchDefaults.colors(checkedThumbColor = AppColors.accent, checkedTrackColor = AppColors.accent.copy(alpha = 0.3f)))
         }
 
         if (reminderEnabled) {
@@ -849,7 +852,8 @@ private fun ReminderSettingsSection(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text("每年循环", fontSize = 15.sp, color = AppColors.textPrimaryLight)
                 Spacer(modifier = Modifier.weight(1f))
-                Switch(checked = isYearlyRepeat, onCheckedChange = onYearlyRepeatChange)
+                Switch(checked = isYearlyRepeat, onCheckedChange = onYearlyRepeatChange,
+                    colors = SwitchDefaults.colors(checkedThumbColor = AppColors.accent, checkedTrackColor = AppColors.accent.copy(alpha = 0.3f)))
             }
         }
     }

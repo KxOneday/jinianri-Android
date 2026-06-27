@@ -99,6 +99,7 @@ class MemorialDayViewModel : ViewModel() {
         NotificationService.scheduleNotification(day, MemorialDayApp.instance)
         loadData()
         refreshDisplay()
+        _days.value = storage.filteredDays(_selectedFilter.value, _selectedCategoryID.value)
     }
 
     fun updateDay(day: MemorialDay) {

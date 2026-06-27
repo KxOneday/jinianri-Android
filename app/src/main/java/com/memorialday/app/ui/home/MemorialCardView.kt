@@ -3,7 +3,7 @@
 
 package com.memorialday.app.ui.home
 
-import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -26,7 +26,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.memorialday.app.models.MemorialDay
 import com.memorialday.app.ui.detail.CardDetailScreen
 import com.memorialday.app.ui.theme.AppColors
 import com.memorialday.app.utils.fromHex
@@ -41,38 +40,41 @@ fun MemorialCardView(
     modifier: Modifier = Modifier
 ) {
     val viewModel = remember { MemorialDayViewModel.getInstance() }
-    var showSwipeActions by remember { mutableStateOf(false) }
+    var swipeActionsShown by remember { mutableStateOf(false) }
     var showDeleteAlert by remember { mutableStateOf(false) }
 
     val selectedDays by viewModel.selectedDays.collectAsState()
     val isSelected = selectedDays.contains(day.id)
 
-    val swipeOffset by animateFloatAsState(
-        targetValue = if (showSwipeActions) -170f else 0f,
+    var swipeActionsShown by remember { mutableStateOf(false) }
+
+    // 使用 dp 作为滑动偏移单位
+    val swipeOffsetDp by animateDpAsState(
+        targetValue = if (swipeActionsShown) 150.dp else 0.dp,
         animationSpec = spring(dampingRatio = 0.6f, stiffness = 200f)
     )
 
     // 删除确认弹窗
     if (showDeleteAlert) {
         AlertDialog(
-            onDismissRequest = { showDeleteAlert = false; showSwipeActions = false },
+            onDismissRequest = { showDeleteAlert = false; swipeActionsShown = false },
             title = { Text("确认删除「${day.title}」？") },
             confirmButton = {
                 TextButton(onClick = {
                     viewModel.deleteDay(day.id)
                     showDeleteAlert = false
-                    showSwipeActions = false
+                    swipeActionsShown = false
                 }) { Text("删除", color = AppColors.error) }
             },
             dismissButton = {
-                TextButton(onClick = { showDeleteAlert = false; showSwipeActions = false }) { Text("取消") }
+                TextButton(onClick = { showDeleteAlert = false; swipeActionsShown = false }) { Text("取消") }
             }
         )
     }
 
     Box(modifier = modifier) {
         // 操作按钮（在滑动时固定显示在右侧）
-        if (showSwipeActions) {
+        if (swipeActionsShown) {
             Row(
                 modifier = Modifier
                     .align(Alignment.CenterEnd)
@@ -85,7 +87,7 @@ fun MemorialCardView(
                         .width(72.dp).height(100.dp)
                         .clip(RoundedCornerShape(14.dp))
                         .background(AppColors.primary)
-                        .clickable { viewModel.togglePin(day.id); showSwipeActions = false },
+                        .clickable { viewModel.togglePin(day.id); swipeActionsShown = false },
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
@@ -116,15 +118,15 @@ fun MemorialCardView(
             onToggleSelect = { viewModel.toggleSelection(day.id) },
             onCardTap = onCardTap,
             modifier = Modifier
-                .offset { IntOffset(swipeOffset.roundToInt(), 0) }
+                .offset(x = -swipeOffsetDp)
                 .pointerInput(Unit) {
                     detectHorizontalDragGestures(
                         onDragEnd = { },
                         onHorizontalDrag = { _, dragAmount ->
-                            if (!showSwipeActions && dragAmount < -30f) {
-                                showSwipeActions = true
-                            } else if (showSwipeActions && dragAmount > 30f) {
-                                showSwipeActions = false
+                            if (!swipeActionsShown && dragAmount < -30f) {
+                                swipeActionsShown = true
+                            } else if (swipeActionsShown && dragAmount > 30f) {
+                                swipeActionsShown = false
                             }
                         }
                     )
