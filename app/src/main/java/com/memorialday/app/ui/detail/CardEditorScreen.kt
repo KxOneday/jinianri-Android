@@ -627,24 +627,11 @@ private fun CardStyleSection(
         Text("背景颜色", fontSize = 13.sp, fontWeight = FontWeight.Medium, color = AppColors.textSecondaryLight)
         Row(verticalAlignment = Alignment.CenterVertically) {
             var showColorPicker by remember { mutableStateOf(false) }
-            Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Color.fromHex(bgColorHex))
-                    .clickable { showColorPicker = true }
-            )
+            Box(modifier = Modifier.size(40.dp).clip(RoundedCornerShape(20.dp))
+                .background(Brush.sweepGradient(listOf(Color.Red, Color.Yellow, Color.Green, Color.Cyan, Color.Blue, Color.Magenta, Color.Red)))
+                .clickable { showColorPicker = true })
             Spacer(modifier = Modifier.width(8.dp))
-            TextButton(onClick = { showColorPicker = true }) {
-                Text("色板", fontSize = 13.sp, color = AppColors.accent)
-            }
-            Spacer(modifier = Modifier.width(4.dp))
-            OutlinedTextField(
-                value = bgColorHex,
-                onValueChange = onBgColorChange,
-                modifier = Modifier.width(100.dp),
-                singleLine = true
-            )
+            OutlinedTextField(value = bgColorHex, onValueChange = onBgColorChange, modifier = Modifier.width(100.dp), singleLine = true)
             if (showColorPicker) {
                 AlertDialog(
                     onDismissRequest = { showColorPicker = false },
@@ -669,36 +656,14 @@ private fun CardStyleSection(
             Spacer(modifier = Modifier.height(8.dp))
             Text("渐变结束色", fontSize = 12.sp, color = AppColors.textSecondaryLight)
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(
-                    modifier = Modifier
-                        .size(36.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(Color.fromHex(bgEndColorHex.ifEmpty { bgColorHex }))
-                )
-                Spacer(modifier = Modifier.width(12.dp))
-                OutlinedTextField(
-                    value = bgEndColorHex,
-                    onValueChange = onBgEndColorChange,
-                    modifier = Modifier.width(100.dp),
-                    singleLine = true
-                )
-            }
-            Spacer(modifier = Modifier.height(6.dp))
-            // 彩色取色圆环 + Hex文字提示 + 色板按钮
-            Row(verticalAlignment = Alignment.CenterVertically) {
                 var show by remember { mutableStateOf(false) }
                 Box(modifier = Modifier.size(40.dp).clip(RoundedCornerShape(20.dp))
                     .background(Brush.sweepGradient(listOf(Color.Red, Color.Yellow, Color.Green, Color.Cyan, Color.Blue, Color.Magenta, Color.Red)))
                     .clickable { show = true })
                 Spacer(modifier = Modifier.width(8.dp))
-                TextButton(onClick = { show = true }) { Text("色板", fontSize = 13.sp, color = AppColors.accent) }
-                Spacer(modifier = Modifier.width(4.dp))
                 OutlinedTextField(value = bgEndColorHex, onValueChange = onBgEndColorChange, modifier = Modifier.width(100.dp), singleLine = true)
                 if (show) ColorGridDialog("选择渐变颜色", bgEndColorHex.ifEmpty { bgColorHex }, { onBgEndColorChange(it); show = false }, { show = false })
             }
-            // 下方配套色板选择区域
-            Spacer(modifier = Modifier.height(6.dp))
-            ColorSpectrumPicker(currentColor = bgEndColorHex.ifEmpty { bgColorHex }, onColorSelected = onBgEndColorChange)
         }
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -711,8 +676,6 @@ private fun CardStyleSection(
                 .background(Brush.sweepGradient(listOf(Color.Red, Color.Yellow, Color.Green, Color.Cyan, Color.Blue, Color.Magenta, Color.Red)))
                 .clickable { show = true })
             Spacer(modifier = Modifier.width(8.dp))
-            TextButton(onClick = { show = true }) { Text("色板", fontSize = 13.sp, color = AppColors.accent) }
-            Spacer(modifier = Modifier.width(4.dp))
             OutlinedTextField(value = textColorHex, onValueChange = onTextColorChange, modifier = Modifier.width(100.dp), singleLine = true)
             if (show) ColorGridDialog("选择文字颜色", textColorHex, { onTextColorChange(it); show = false }, { show = false })
         }
