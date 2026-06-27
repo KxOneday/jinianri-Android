@@ -59,6 +59,13 @@ fun HomeScreen(modifier: Modifier = Modifier) {
 
     LaunchedEffect(Unit) { viewModel.refreshDisplay() }
 
+    // 当编辑器/模板/详情关闭时刷新首页数据
+    LaunchedEffect(showNewEditor, selectedDayForEdit, selectedDayForDetail, showTemplates) {
+        if (!showNewEditor && selectedDayForEdit == null && selectedDayForDetail == null && !showTemplates) {
+            viewModel.refreshDisplay()
+        }
+    }
+
     Box(
         modifier = modifier
             .fillMaxSize()

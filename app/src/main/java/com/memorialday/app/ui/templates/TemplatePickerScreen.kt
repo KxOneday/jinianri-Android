@@ -62,6 +62,7 @@ fun TemplatePickerScreen(onDismiss: () -> Unit) {
                 .padding(padding)
                 .background(AppColors.backgroundLight)
                 .padding(vertical = 16.dp)
+                .padding(bottom = 100.dp)
         ) {
             // 顶部说明
             item {

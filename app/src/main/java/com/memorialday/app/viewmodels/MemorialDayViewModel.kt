@@ -108,6 +108,7 @@ class MemorialDayViewModel : ViewModel() {
         NotificationService.scheduleNotification(day, MemorialDayApp.instance)
         loadData()
         refreshDisplay()
+        _days.value = _days.value.toList()
     }
 
     fun deleteDay(id: UUID) {
