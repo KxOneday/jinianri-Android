@@ -180,7 +180,8 @@ fun CardEditorScreen(
                 useGradient = useGradient, onUseGradientChange = { useGradient = it },
                 fontSize = fontSize, onFontSizeChange = { fontSize = it },
                 cornerRadius = cornerRadius, onCornerRadiusChange = { cornerRadius = it },
-                shadowRadius = shadowRadius, onShadowRadiusChange = { shadowRadius = it }
+                shadowRadius = shadowRadius, onShadowRadiusChange = { shadowRadius = it },
+                iconName = selectedIcon, onIconChange = { selectedIcon = it }
             )
 
             // 提醒设置
@@ -617,7 +618,8 @@ private fun CardStyleSection(
     useGradient: Boolean, onUseGradientChange: (Boolean) -> Unit,
     fontSize: Double, onFontSizeChange: (Double) -> Unit,
     cornerRadius: Double, onCornerRadiusChange: (Double) -> Unit,
-    shadowRadius: Double, onShadowRadiusChange: (Double) -> Unit
+    shadowRadius: Double, onShadowRadiusChange: (Double) -> Unit,
+    iconName: String, onIconChange: (String) -> Unit
 ) {
     SectionContainer("卡片样式") {
         // 背景颜色
@@ -658,7 +660,8 @@ private fun CardStyleSection(
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text("渐变底色", fontSize = 15.sp, color = AppColors.textPrimaryLight)
             Spacer(modifier = Modifier.weight(1f))
-            Switch(checked = useGradient, onCheckedChange = onUseGradientChange)
+            Switch(checked = useGradient, onCheckedChange = onUseGradientChange,
+                colors = SwitchDefaults.colors(checkedThumbColor = AppColors.accent, checkedTrackColor = AppColors.accent.copy(alpha = 0.3f)))
         }
 
         if (useGradient) {
@@ -680,33 +683,21 @@ private fun CardStyleSection(
                 )
             }
             Spacer(modifier = Modifier.height(6.dp))
-            var showGradPicker by remember { mutableStateOf(false) }
+            // 彩色取色圆环 + Hex文字提示 + 色板按钮
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(
-                    modifier = Modifier.size(36.dp).clip(RoundedCornerShape(8.dp))
-                        .background(Color.fromHex(bgEndColorHex.ifEmpty { bgColorHex }))
-                        .clickable { showGradPicker = true }
-                )
+                var show by remember { mutableStateOf(false) }
+                Box(modifier = Modifier.size(40.dp).clip(RoundedCornerShape(20.dp))
+                    .background(Brush.sweepGradient(listOf(Color.Red, Color.Yellow, Color.Green, Color.Cyan, Color.Blue, Color.Magenta, Color.Red)))
+                    .clickable { show = true })
                 Spacer(modifier = Modifier.width(8.dp))
-                TextButton(onClick = { showGradPicker = true }) {
-                    Text("色板", fontSize = 13.sp, color = AppColors.accent)
-                }
+                TextButton(onClick = { show = true }) { Text("色板", fontSize = 13.sp, color = AppColors.accent) }
                 Spacer(modifier = Modifier.width(4.dp))
-                OutlinedTextField(
-                    value = bgEndColorHex,
-                    onValueChange = onBgEndColorChange,
-                    modifier = Modifier.width(100.dp),
-                    singleLine = true
-                )
+                OutlinedTextField(value = bgEndColorHex, onValueChange = onBgEndColorChange, modifier = Modifier.width(100.dp), singleLine = true)
+                if (show) ColorGridDialog("选择渐变颜色", bgEndColorHex.ifEmpty { bgColorHex }, { onBgEndColorChange(it); show = false }, { show = false })
             }
-            if (showGradPicker) {
-                AlertDialog(
-                    onDismissRequest = { showGradPicker = false },
-                    title = { Text("选择渐变颜色") },
-                    text = { ColorSpectrumPicker(currentColor = bgEndColorHex.ifEmpty { bgColorHex }, onColorSelected = { onBgEndColorChange(it); showGradPicker = false }) },
-                    confirmButton = { TextButton(onClick = { showGradPicker = false }) { Text("确定") } }
-                )
-            }
+            // 下方配套色板选择区域
+            Spacer(modifier = Modifier.height(6.dp))
+            ColorSpectrumPicker(currentColor = bgEndColorHex.ifEmpty { bgColorHex }, onColorSelected = onBgEndColorChange)
         }
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -714,60 +705,77 @@ private fun CardStyleSection(
         // 文字颜色
         Text("文字颜色", fontSize = 13.sp, fontWeight = FontWeight.Medium, color = AppColors.textSecondaryLight)
         Row(verticalAlignment = Alignment.CenterVertically) {
-            var showTextPicker by remember { mutableStateOf(false) }
-            Box(
-                modifier = Modifier.size(36.dp).clip(RoundedCornerShape(8.dp))
-                    .background(Color.fromHex(textColorHex))
-                    .clickable { showTextPicker = true }
-            )
+            var show by remember { mutableStateOf(false) }
+            Box(modifier = Modifier.size(40.dp).clip(RoundedCornerShape(20.dp))
+                .background(Brush.sweepGradient(listOf(Color.Red, Color.Yellow, Color.Green, Color.Cyan, Color.Blue, Color.Magenta, Color.Red)))
+                .clickable { show = true })
             Spacer(modifier = Modifier.width(8.dp))
-            TextButton(onClick = { showTextPicker = true }) {
-                Text("色板", fontSize = 13.sp, color = AppColors.accent)
-            }
+            TextButton(onClick = { show = true }) { Text("色板", fontSize = 13.sp, color = AppColors.accent) }
             Spacer(modifier = Modifier.width(4.dp))
-            OutlinedTextField(
-                value = textColorHex,
-                onValueChange = onTextColorChange,
-                modifier = Modifier.width(100.dp),
-                singleLine = true
-            )
-            if (showTextPicker) {
-                AlertDialog(
-                    onDismissRequest = { showTextPicker = false },
-                    title = { Text("选择文字颜色") },
-                    text = { ColorSpectrumPicker(currentColor = textColorHex, onColorSelected = { onTextColorChange(it); showTextPicker = false }) },
-                    confirmButton = { TextButton(onClick = { showTextPicker = false }) { Text("确定") } }
-                )
-            }
+            OutlinedTextField(value = textColorHex, onValueChange = onTextColorChange, modifier = Modifier.width(100.dp), singleLine = true)
+            if (show) ColorGridDialog("选择文字颜色", textColorHex, { onTextColorChange(it); show = false }, { show = false })
         }
 
         Spacer(modifier = Modifier.height(12.dp))
 
+        // 4. 图标选择栏：2行16个
+        val iconList = listOf(
+            "favorite" to Icons.Filled.Favorite, "star" to Icons.Filled.Star,
+            "card_giftcard" to Icons.Filled.CardGiftcard, "auto_awesome" to Icons.Filled.AutoAwesome,
+            "local_fire_department" to Icons.Filled.LocalFireDepartment, "dark_mode" to Icons.Filled.DarkMode,
+            "light_mode" to Icons.Filled.LightMode, "balloon" to Icons.Filled.Balloon,
+            "crown" to Icons.Filled.Crown, "auto_awesome_mosaic" to Icons.Filled.AutoAwesomeMosaic,
+            "celebration" to Icons.Filled.Celebration, "celebration_outlined" to Icons.Filled.Celebration,
+            "menu_book" to Icons.Filled.MenuBook, "work" to Icons.Filled.Work,
+            "flight" to Icons.Filled.Flight, "notifications" to Icons.Filled.Notifications
+        )
+        Text("选择图标", fontSize = 13.sp, fontWeight = FontWeight.Medium, color = AppColors.textSecondaryLight)
+        (0..1).forEach { row ->
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                iconList.drop(row * 8).take(8).forEach { (name, icon) ->
+                    val selected = iconName == name
+                    IconButton(onClick = { onIconChange(name) },
+                        modifier = Modifier.size(36.dp)
+                            .then(if (selected) Modifier.background(AppColors.accent.copy(alpha = 0.15f), RoundedCornerShape(8.dp))
+                            else Modifier.background(Color.Transparent))
+                    ) { Icon(icon, null, Modifier.size(18.dp), tint = if (selected) AppColors.accent else AppColors.textSecondaryLight) }
+                }
+            }
+            if (row == 0) Spacer(modifier = Modifier.height(4.dp))
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // 5. 滑块（粉色系）
         // 字号
         Text("标题字号: ${fontSize.toInt()}", fontSize = 12.sp, color = AppColors.textSecondaryLight)
-        Slider(
-            value = fontSize.toFloat(),
-            onValueChange = { onFontSizeChange(it.toDouble()) },
-            valueRange = 14f..48f,
-            steps = 16
-        )
+        Slider(value = fontSize.toFloat(), onValueChange = { onFontSizeChange(it.toDouble()) },
+            valueRange = 14f..48f, steps = 16,
+            colors = SliderDefaults.colors(thumbColor = AppColors.accent, activeTrackColor = AppColors.accent))
 
         // 圆角
-        Text("圆角: ${cornerRadius.toInt()}", fontSize = 12.sp, color = AppColors.textSecondaryLight)
-        Slider(
-            value = cornerRadius.toFloat(),
-            onValueChange = { onCornerRadiusChange(it.toDouble()) },
-            valueRange = 0f..28f
-        )
+        Text("卡片圆角: ${cornerRadius.toInt()}", fontSize = 12.sp, color = AppColors.textSecondaryLight)
+        Slider(value = cornerRadius.toFloat(), onValueChange = { onCornerRadiusChange(it.toDouble()) },
+            valueRange = 0f..28f,
+            colors = SliderDefaults.colors(thumbColor = AppColors.accent, activeTrackColor = AppColors.accent))
 
-        // 阴影
-        Text("阴影: ${shadowRadius.toInt()}", fontSize = 12.sp, color = AppColors.textSecondaryLight)
-        Slider(
-            value = shadowRadius.toFloat(),
-            onValueChange = { onShadowRadiusChange(it.toDouble()) },
-            valueRange = 0f..20f
-        )
+        Text("阴影强度: ${shadowRadius.toInt()}", fontSize = 12.sp, color = AppColors.textSecondaryLight)
+        Slider(value = shadowRadius.toFloat(), onValueChange = { onShadowRadiusChange(it.toDouble()) },
+            valueRange = 0f..20f,
+            colors = SliderDefaults.colors(thumbColor = AppColors.accent, activeTrackColor = AppColors.accent))
     }
+}
+
+// MARK: - 颜色选择弹窗
+
+@Composable
+private fun ColorGridDialog(title: String, currentColor: String, onSelect: (String) -> Unit, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(title) },
+        text = { ColorSpectrumPicker(currentColor = currentColor, onColorSelected = onSelect) },
+        confirmButton = { TextButton(onClick = onDismiss) { Text("确定") } }
+    )
 }
 
 // MARK: - 提醒设置
