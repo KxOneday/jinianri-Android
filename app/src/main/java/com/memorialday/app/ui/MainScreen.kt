@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -45,11 +46,11 @@ fun MainScreen(onLockRequested: () -> Unit = {}) {
                         icon = { Icon(tab.icon, contentDescription = tab.title) },
                         label = { Text(tab.title, fontSize = 11.sp) },
                         colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = AppColors.accent,
-                            selectedTextColor = AppColors.accent,
+                            selectedIconColor = Color(0xFF4A90D9),
+                            selectedTextColor = Color(0xFF4A90D9),
                             unselectedIconColor = AppColors.textSecondaryLight,
                             unselectedTextColor = AppColors.textSecondaryLight,
-                            indicatorColor = AppColors.accent.copy(alpha = 0.12f)
+                            indicatorColor = Color(0xFF4A90D9).copy(alpha = 0.12f)
                         )
                     )
                 }
