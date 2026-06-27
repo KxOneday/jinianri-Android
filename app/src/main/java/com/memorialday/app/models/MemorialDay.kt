@@ -45,7 +45,7 @@ data class MemorialDay(
     var iconName: String = "favorite",  // Android drawable / Material icon
     var cornerRadius: Double = 16.0,
     var shadowRadius: Double = 8.0,
-    var showGradient: Boolean = true,
+    var showGradient: Boolean = false,
 
     // 循环标记
     var isYearlyRepeat: Boolean = false,

@@ -214,10 +214,15 @@ private fun saveDay(
 ) {
     var day = editDay ?: MemorialDay()
 
-    // 日期处理
-    val finalDate = if (useLunarCalendar && lunarMonth >= 1 && lunarDay >= 1) {
-        val lunarDate = LunarDate(lunarYear, lunarMonth, lunarDay, isLeapMonth)
-        LunarCalendarService.lunarToSolar(lunarDate) ?: targetDate
+    // 日期处理 - 强制转换，确保 targetDate 更新
+    val finalDate = if (useLunarCalendar && lunarMonth >= 1 && lunarDay >= 1 && lunarYear >= 1900) {
+        try {
+            val lunarDate = LunarDate(lunarYear, lunarMonth, lunarDay, isLeapMonth)
+            val converted = LunarCalendarService.lunarToSolar(lunarDate)
+            if (converted != null) converted else targetDate
+        } catch (_: Exception) {
+            targetDate
+        }
     } else {
         targetDate
     }

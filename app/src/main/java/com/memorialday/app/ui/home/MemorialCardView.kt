@@ -48,7 +48,7 @@ fun MemorialCardView(
     val isSelected = selectedDays.contains(day.id)
 
     val swipeOffset by animateFloatAsState(
-        targetValue = if (showSwipeActions) -140f else 0f,
+        targetValue = if (showSwipeActions) -160f else 0f,
         animationSpec = spring(dampingRatio = 0.6f, stiffness = 200f)
     )
 

@@ -125,10 +125,10 @@ object LunarCalendarService {
         val leapMonth = lunarLeapMonth(lunar.year)
 
         for (m in 1 until lunar.month) {
-            totalDays += lunarMonthDays(lunar.year, m)
             if (m == leapMonth) {
                 totalDays += lunarLeapDays(lunar.year)
             }
+            totalDays += lunarMonthDays(lunar.year, m)
         }
 
         if (lunar.isLeapMonth) {
