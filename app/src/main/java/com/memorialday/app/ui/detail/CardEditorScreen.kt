@@ -148,7 +148,15 @@ fun CardEditorScreen(
             // 日期选择
             DateSection(
                 targetDate = targetDate, onDateChange = { targetDate = it },
-                useLunarCalendar = useLunarCalendar, onUseLunarChange = { useLunarCalendar = it },
+                useLunarCalendar = useLunarCalendar, onUseLunarChange = { newVal ->
+                    useLunarCalendar = newVal
+                    if (newVal) {
+                        val lunar = LunarCalendarService.solarToLunar(targetDate)
+                        lunarMonth = lunar.month
+                        lunarDay = lunar.day
+                        isLeapMonth = lunar.isLeapMonth
+                    }
+                },
                 lunarYear = lunarYear, onLunarYearChange = { lunarYear = it },
                 lunarMonth = lunarMonth, onLunarMonthChange = { lunarMonth = it },
                 lunarDay = lunarDay, onLunarDayChange = { lunarDay = it },
@@ -523,6 +531,23 @@ private fun DateSection(
                     Spacer(modifier = Modifier.weight(1f))
                     Switch(checked = isLeapMonth, onCheckedChange = onLeapMonthChange)
                 }
+                // 农历预览：显示对应公历
+                if (lunarMonth >= 1 && lunarDay >= 1) {
+                    val solarStr = try {
+                        val lunarDate = LunarDate(lunarYear, lunarMonth, lunarDay, isLeapMonth)
+                        val solar = LunarCalendarService.lunarToSolar(lunarDate)
+                        val fmt = java.text.SimpleDateFormat("yyyy年M月d日", java.util.Locale.CHINESE)
+                        if (solar != null) fmt.format(solar) else null
+                    } catch (_: Exception) { null }
+                    if (solarStr != null) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Filled.WbSunny, null, modifier = Modifier.size(12.dp), tint = AppColors.warning)
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text("公历: $solarStr", fontSize = 13.sp, color = AppColors.textSecondaryLight)
+                        }
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -770,7 +795,7 @@ private fun ReminderSettingsSection(
 
             Text("提前天数", fontSize = 13.sp, color = AppColors.textSecondaryLight)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                listOf(0, 1, 3, 7, 15, 30).forEach { d ->
+                listOf(0, 1, 3, 7, 15).forEach { d ->
                     FilterChip(if (d == 0) "当天" else "${d}天", null, advanceDays == d) {
                         onAdvanceDaysChange(d)
                     }

@@ -48,7 +48,7 @@ fun MemorialCardView(
     val isSelected = selectedDays.contains(day.id)
 
     val swipeOffset by animateFloatAsState(
-        targetValue = if (showSwipeActions) -160f else 0f,
+        targetValue = if (showSwipeActions) -170f else 0f,
         animationSpec = spring(dampingRatio = 0.6f, stiffness = 200f)
     )
 
@@ -119,9 +119,13 @@ fun MemorialCardView(
                 .offset { IntOffset(swipeOffset.roundToInt(), 0) }
                 .pointerInput(Unit) {
                     detectHorizontalDragGestures(
-                        onDragEnd = { if (swipeOffset < -80f) showSwipeActions = true },
+                        onDragEnd = { },
                         onHorizontalDrag = { _, dragAmount ->
-                            if (!showSwipeActions && dragAmount < -20f) showSwipeActions = true
+                            if (!showSwipeActions && dragAmount < -30f) {
+                                showSwipeActions = true
+                            } else if (showSwipeActions && dragAmount > 30f) {
+                                showSwipeActions = false
+                            }
                         }
                     )
                 }
